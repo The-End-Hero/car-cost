@@ -1,7 +1,6 @@
 import { HashRouter, Route, Routes, useLocation } from "react-router-dom";
 import Home from "@/pages/home/Home.tsx";
 import "./App.css";
-import Login from "@/pages/login/Login.tsx";
 import { AnimatePresence } from "motion/react";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 
@@ -26,7 +25,6 @@ function AppContent() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
       </Routes>
     </AnimatePresence>
   );
