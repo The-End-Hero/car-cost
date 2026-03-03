@@ -19,15 +19,13 @@ const DEFAULT_INSURANCE = 7500;
 const DEFAULT_MILEAGE = 12000;
 const DEFAULT_PARKING_FEE_PER_YEAR = 0;
 const DEFAULT_ENERGY_COST_PER_KM = 0.1;
-const DEFAULT_PURCHASE_TAX = 0;
+const DEFAULT_INITIAL_ONE_TIME_FEE = 10000;
 const DEFAULT_DOWN_PAYMENT = 90000;
-const DEFAULT_TAX_AND_INSURANCE = 30000;
 const DEFAULT_LOAN_MONTHS = 36;
 const DEFAULT_ANNUAL_LOAN_RATE = 0.03;
 const DEFAULT_MONTHLY_OPEX = 2500;
 const DEFAULT_MARKET_RETURN_RATE = 0.04;
 const DEFAULT_ANALYSIS_YEARS = 5;
-const DEFAULT_RESIDUAL_RATE = 0.4;
 const DEFAULT_OPTION_COST = 0;
 const DEFAULT_OPTION_RESIDUAL_RATE = 0.2;
 
@@ -47,19 +45,17 @@ interface FormValues {
   depreciationRate5: number;
   depreciationRate8: number;
   insuranceFirstYear: number;
-  /** 购置税等一次性支出（元），仅用于综合成本模块 */
-  purchaseTax: number;
+  /** 购置税、上牌、等一次性支出（元），同时用于综合成本与现金流模块 */
+  initialOneTimeFee: number;
   mileagePerYear: number;
   parkingFeePerYear: number;
   energyCostPerKm: number;
   downPayment: number;
-  taxAndInsurance: number;
   loanMonths: number;
   annualLoanRate: number;
   monthlyOpEx: number;
   marketReturnRate: number;
   analysisYears: number;
-  residualRate: number;
   optionCost: number;
   optionResidualRate: number;
 }
@@ -143,7 +139,7 @@ const Home = () => {
     const r5 = vals.depreciationRate5 ?? DEFAULT_RATE_5;
     const r8 = vals.depreciationRate8 ?? DEFAULT_RATE_8;
     const ins = vals.insuranceFirstYear ?? DEFAULT_INSURANCE;
-    const purchaseTax = vals.purchaseTax ?? DEFAULT_PURCHASE_TAX;
+    const initialOneTimeFee = vals.initialOneTimeFee ?? DEFAULT_INITIAL_ONE_TIME_FEE;
     const mileage = vals.mileagePerYear ?? DEFAULT_MILEAGE;
      const parkingFeePerYear = vals.parkingFeePerYear ?? DEFAULT_PARKING_FEE_PER_YEAR;
      const energyCostPerKm = vals.energyCostPerKm ?? DEFAULT_ENERGY_COST_PER_KM;
@@ -158,7 +154,7 @@ const Home = () => {
       mileagePerYear: mileage,
       parkingFeePerYear,
       energyCostPerKm,
-      purchaseTax,
+      purchaseTax: initialOneTimeFee,
     });
   }, [formValues]);
 
@@ -167,24 +163,23 @@ const Home = () => {
     if (!vals || typeof vals !== "object") return null;
     const price = vals.price ?? DEFAULT_PRICE;
     const downPayment = vals.downPayment ?? DEFAULT_DOWN_PAYMENT;
-    const taxAndInsurance = vals.taxAndInsurance ?? DEFAULT_TAX_AND_INSURANCE;
+    const initialOneTimeFee = vals.initialOneTimeFee ?? DEFAULT_INITIAL_ONE_TIME_FEE;
     const loanMonths = vals.loanMonths ?? DEFAULT_LOAN_MONTHS;
     const annualLoanRate = vals.annualLoanRate ?? DEFAULT_ANNUAL_LOAN_RATE;
     const monthlyOpEx = vals.monthlyOpEx ?? DEFAULT_MONTHLY_OPEX;
     const marketReturnRate = vals.marketReturnRate ?? DEFAULT_MARKET_RETURN_RATE;
     const analysisYears = vals.analysisYears ?? DEFAULT_ANALYSIS_YEARS;
-    const residualRate = vals.residualRate ?? DEFAULT_RESIDUAL_RATE;
+    const depreciationRate5 = vals.depreciationRate5 ?? DEFAULT_RATE_5;
+    const residualRate = Math.min(1, Math.max(0, 1 - depreciationRate5));
     const optionCost = vals.optionCost ?? DEFAULT_OPTION_COST;
     const optionResidualRate = vals.optionResidualRate ?? DEFAULT_OPTION_RESIDUAL_RATE;
     if (
       price <= 0 ||
       downPayment < 0 ||
-      taxAndInsurance < 0 ||
+      initialOneTimeFee < 0 ||
       loanMonths < 0 ||
       monthlyOpEx < 0 ||
       analysisYears < 1 ||
-      residualRate < 0 ||
-      residualRate > 1 ||
       optionCost < 0 ||
       (optionCost > 0 && (optionResidualRate < 0 || optionResidualRate > 1))
     )
@@ -193,7 +188,7 @@ const Home = () => {
       {
         price,
         downPayment,
-        taxAndInsurance,
+        taxAndInsurance: initialOneTimeFee,
         loanMonths,
         annualLoanRate,
         monthlyOpEx,
@@ -268,7 +263,7 @@ const Home = () => {
     const chart = echarts.init(barChartRef.current, isDark ? "dark" : undefined);
     const vals = formValues as Partial<FormValues> | undefined;
     const downPayment = vals?.downPayment ?? DEFAULT_DOWN_PAYMENT;
-    const taxAndInsurance = vals?.taxAndInsurance ?? DEFAULT_TAX_AND_INSURANCE;
+    const initialOneTimeFee = vals?.initialOneTimeFee ?? DEFAULT_INITIAL_ONE_TIME_FEE;
     const analysisYears = vals?.analysisYears ?? DEFAULT_ANALYSIS_YEARS;
     const loanMonths = vals?.loanMonths ?? DEFAULT_LOAN_MONTHS;
     const monthlyOpEx = vals?.monthlyOpEx ?? DEFAULT_MONTHLY_OPEX;
@@ -277,7 +272,7 @@ const Home = () => {
     const optionCost = vals?.optionCost ?? DEFAULT_OPTION_COST;
     const data = [
       { value: downPayment, name: "首付" },
-      { value: taxAndInsurance, name: "税费杂费" },
+      { value: initialOneTimeFee, name: "一次性费用" },
       ...(optionCost > 0 ? [{ value: optionCost, name: "选配" }] : []),
       { value: totalLoan, name: "月供总额" },
       { value: totalOpEx, name: "养车总额" },
@@ -331,18 +326,16 @@ const Home = () => {
               depreciationRate5: DEFAULT_RATE_5,
               depreciationRate8: DEFAULT_RATE_8,
               insuranceFirstYear: DEFAULT_INSURANCE,
-              purchaseTax: DEFAULT_PURCHASE_TAX,
+              initialOneTimeFee: DEFAULT_INITIAL_ONE_TIME_FEE,
               mileagePerYear: DEFAULT_MILEAGE,
               parkingFeePerYear: DEFAULT_PARKING_FEE_PER_YEAR,
               energyCostPerKm: DEFAULT_ENERGY_COST_PER_KM,
               downPayment: DEFAULT_DOWN_PAYMENT,
-              taxAndInsurance: DEFAULT_TAX_AND_INSURANCE,
               loanMonths: DEFAULT_LOAN_MONTHS,
               annualLoanRate: DEFAULT_ANNUAL_LOAN_RATE,
               monthlyOpEx: DEFAULT_MONTHLY_OPEX,
               marketReturnRate: DEFAULT_MARKET_RETURN_RATE,
               analysisYears: DEFAULT_ANALYSIS_YEARS,
-              residualRate: DEFAULT_RESIDUAL_RATE,
               optionCost: DEFAULT_OPTION_COST,
               optionResidualRate: DEFAULT_OPTION_RESIDUAL_RATE,
             }}
@@ -413,10 +406,10 @@ const Home = () => {
             <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
           </Form.Item>
           <Form.Item
-            name="purchaseTax"
-            label="购置税（元，一次性）"
+            name="initialOneTimeFee"
+            label="购置税、上牌、等一次性支出（元）"
             rules={[{ type: "number", min: 0, message: "不能为负" }]}
-            extra="仅计入综合成本模块，默认 0 元。"
+            extra="一次性费用，同时用于上方综合成本与下方现金流/机会成本分析，无需重复填写。"
           >
             <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
           </Form.Item>
@@ -448,120 +441,87 @@ const Home = () => {
             />
           </Form.Item>
 
-          <div className="mb-4 mt-4">
-            <Collapse
-              items={[
-                {
-                  key: "cashflow",
-                  label: "现金流与机会成本（贷款、复利、残值）",
-                  children: (
-                    <>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                        残值率 = 1 - 折旧率，可与上方「5 年折旧率」联动（5 年残值率 ≈ 1 - 5年折旧率）。
-                      </p>
-                      <Form.Item
-                        name="downPayment"
-                        label="首付（元）"
-                        rules={[{ required: true }, { type: "number", min: 0 }]}
-                      >
-                        <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
-                      </Form.Item>
-                      <Form.Item
-                        name="taxAndInsurance"
-                        label="购置税、首年保险等杂费（元）"
-                        rules={[{ required: true }, { type: "number", min: 0 }]}
-                      >
-                        <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
-                      </Form.Item>
-                      <Form.Item
-                        name="optionCost"
-                        label="选配费用（元）"
-                        rules={[{ type: "number", min: 0 }]}
-                        extra="购车时一次性支付。选配保值率多数低于车体，下方可单独填选配残值率。"
-                      >
-                        <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
-                      </Form.Item>
-                      <Form.Item
-                        name="optionResidualRate"
-                        label="选配残值率（0~1）"
-                        rules={[{ type: "number", min: 0, max: 1 }]}
-                        extra="选配在 N 年后的残值率，多数低于车辆本身，可填 0.15~0.25。"
-                      >
-                        <InputNumber
-                          style={{ width: INPUT_NUMBER_WIDTH }}
-                          min={0}
-                          max={1}
-                          step={0.01}
-                          suffix="如 0.2 即 20%"
-                        />
-                      </Form.Item>
-                      <Form.Item
-                        name="loanMonths"
-                        label="贷款月数"
-                        rules={[{ required: true }, { type: "number", min: 0 }]}
-                      >
-                        <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="月" />
-                      </Form.Item>
-                      <Form.Item
-                        name="annualLoanRate"
-                        label="贷款年化利率"
-                        rules={[{ required: true }, { type: "number", min: 0 }]}
-                      >
-                        <InputNumber
-                          style={{ width: INPUT_NUMBER_WIDTH }}
-                          min={0}
-                          step={0.01}
-                          suffix="如 0.03 即 3%"
-                        />
-                      </Form.Item>
-                      <Form.Item
-                        name="monthlyOpEx"
-                        label="月均养车费（元）"
-                        rules={[{ required: true }, { type: "number", min: 0 }]}
-                      >
-                        <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
-                      </Form.Item>
-                      <Form.Item
-                        name="marketReturnRate"
-                        label="理财年化收益率（机会成本）"
-                        rules={[{ required: true }, { type: "number", min: 0 }]}
-                      >
-                        <InputNumber
-                          style={{ width: INPUT_NUMBER_WIDTH }}
-                          min={0}
-                          step={0.01}
-                          suffix="如 0.04 即 4%"
-                        />
-                      </Form.Item>
-                      <Form.Item
-                        name="analysisYears"
-                        label="分析年数"
-                        rules={[{ required: true }, { type: "number", min: 1 }]}
-                      >
-                        <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={1} suffix="年" />
-                      </Form.Item>
-                      <Form.Item
-                        name="residualRate"
-                        label="N 年后残值率（0~1）"
-                        rules={[
-                          { required: true },
-                          { type: "number", min: 0, max: 1, message: "0~1 之间" },
-                        ]}
-                      >
-                        <InputNumber
-                          style={{ width: INPUT_NUMBER_WIDTH }}
-                          min={0}
-                          max={1}
-                          step={0.01}
-                          suffix="如 0.4 即 40%"
-                        />
-                      </Form.Item>
-                    </>
-                  ),
-                },
-              ]}
-            />
-            </div>
+          <div className="mb-4 mt-6">
+            <Typography.Title level={5}>现金流与机会成本参数（贷款、复利、残值）</Typography.Title>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+              残值率已由上方「5 年折旧率」自动推导（约等于 1 - 5 年折旧率），无需单独填写。
+            </p>
+            <Form.Item
+              name="downPayment"
+              label="首付（元）"
+              rules={[{ required: true }, { type: "number", min: 0 }]}
+            >
+              <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
+            </Form.Item>
+            <Form.Item
+              name="optionCost"
+              label="选配费用（元）"
+              rules={[{ type: "number", min: 0 }]}
+              extra="购车时一次性支付。选配保值率多数低于车体，下方可单独填选配残值率。"
+            >
+              <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
+            </Form.Item>
+            <Form.Item
+              name="optionResidualRate"
+              label="选配残值率（0~1）"
+              rules={[{ type: "number", min: 0, max: 1 }]}
+              extra="选配在分析期末的残值率，多数低于车辆本身，可填 0.15~0.25。"
+            >
+              <InputNumber
+                style={{ width: INPUT_NUMBER_WIDTH }}
+                min={0}
+                max={1}
+                step={0.01}
+                suffix="如 0.2 即 20%"
+              />
+            </Form.Item>
+            <Form.Item
+              name="loanMonths"
+              label="贷款月数"
+              rules={[{ required: true }, { type: "number", min: 0 }]}
+            >
+              <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="月" />
+            </Form.Item>
+            <Form.Item
+              name="annualLoanRate"
+              label="贷款年化利率"
+              rules={[{ required: true }, { type: "number", min: 0 }]}
+            >
+              <InputNumber
+                style={{ width: INPUT_NUMBER_WIDTH }}
+                min={0}
+                step={0.01}
+                suffix="如 0.03 即 3%"
+              />
+            </Form.Item>
+            <Form.Item
+              name="monthlyOpEx"
+              label="月均养车费（元）"
+              rules={[{ required: true }, { type: "number", min: 0 }]}
+              extra="包含油/电、停车、保险、保养、洗车等全部月均支出总和，用于现金流与机会成本分析。"
+            >
+              <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
+            </Form.Item>
+            <Form.Item
+              name="marketReturnRate"
+              label="理财年化收益率（机会成本）"
+              rules={[{ required: true }, { type: "number", min: 0 }]}
+            >
+              <InputNumber
+                style={{ width: INPUT_NUMBER_WIDTH }}
+                min={0}
+                step={0.01}
+                suffix="如 0.04 即 4%"
+              />
+            </Form.Item>
+            <Form.Item
+              name="analysisYears"
+              label="分析年数"
+              rules={[{ required: true }, { type: "number", min: 1 }]}
+            >
+              <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={1} suffix="年" />
+            </Form.Item>
+          </div>
           </Form>
 
           {result && (
