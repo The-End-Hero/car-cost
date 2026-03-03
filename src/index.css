@@ -1,1 +1,17 @@
 @import "tailwindcss";
+
+/* 全局主题背景：与 antd 暗色/亮色一致 */
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
+}
+body {
+  background-color: #ffffff;
+  color: rgba(0, 0, 0, 0.88);
+}
+html.dark body {
+  background-color: #141414;
+  color: rgba(255, 255, 255, 0.85);
+}

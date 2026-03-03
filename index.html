@@ -8,6 +8,19 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- 首屏主题：与 stores/theme 同 key，默认暗色，避免闪亮 -->
+    <script>
+      (function () {
+        var key = "car-cost-theme";
+        try {
+          var raw = localStorage.getItem(key);
+          var mode = raw ? (JSON.parse(raw).state?.mode) : null;
+          if (mode !== "light") document.documentElement.classList.add("dark");
+        } catch (e) {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

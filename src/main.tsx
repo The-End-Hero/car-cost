@@ -2,10 +2,13 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 
 const root = createRoot(document.getElementById("root")!);
 root.render(
   // <StrictMode>
-  <App />,
+  <ThemeProvider>
+    <App />
+  </ThemeProvider>,
   // </StrictMode>,
 );

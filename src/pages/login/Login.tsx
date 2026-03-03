@@ -1,22 +1,24 @@
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
+import { Button, Card, Typography } from "antd";
 
 const Login = () => {
   return (
     <motion.div
-      className="w-screen h-screen bg-amber-400 flex flex-col items-center justify-center text-white"
+      className="w-screen min-h-screen flex flex-col items-center justify-center p-4"
       initial={{ opacity: 0, filter: "blur(8px)" }}
       animate={{ opacity: 1, filter: "blur(0px)" }}
       exit={{ opacity: 0, filter: "blur(8px)" }}
-      transition={{ duration: 2 }}
+      transition={{ duration: 0.3 }}
     >
-      <h1 className="text-4xl font-bold mb-4">Login Page</h1>
-      <Link
-        to="/"
-        className="px-4 py-2 bg-white text-amber-700 rounded-md hover:bg-gray-100 transition-colors"
-      >
-        Back to Home
-      </Link>
+      <Card className="max-w-md w-full">
+        <Typography.Title level={2} className="!mb-4">
+          Login Page
+        </Typography.Title>
+        <Link to="/">
+          <Button size="large">Back to Home</Button>
+        </Link>
+      </Card>
     </motion.div>
   );
 };

@@ -3,11 +3,17 @@ import Home from "@/pages/home/Home.tsx";
 import "./App.css";
 import Login from "@/pages/login/Login.tsx";
 import { AnimatePresence } from "motion/react";
+import { ThemeSwitch } from "@/components/ThemeSwitch";
 
 function App() {
   return (
     <HashRouter>
-      <AppContent />
+      <div className="min-h-screen">
+        <div className="fixed top-4 right-4 z-50">
+          <ThemeSwitch />
+        </div>
+        <AppContent />
+      </div>
     </HashRouter>
   );
 }
