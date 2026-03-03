@@ -267,14 +267,14 @@ const Home = () => {
     if (!barChartRef.current || !cashFlowResult) return;
     const chart = echarts.init(barChartRef.current, isDark ? "dark" : undefined);
     const vals = formValues as Partial<FormValues> | undefined;
-    const downPayment = vals?.downPayment ?? 0;
-    const taxAndInsurance = vals?.taxAndInsurance ?? 0;
-    const analysisYears = vals?.analysisYears ?? 5;
-    const loanMonths = vals?.loanMonths ?? 36;
-    const monthlyOpEx = vals?.monthlyOpEx ?? 0;
+    const downPayment = vals?.downPayment ?? DEFAULT_DOWN_PAYMENT;
+    const taxAndInsurance = vals?.taxAndInsurance ?? DEFAULT_TAX_AND_INSURANCE;
+    const analysisYears = vals?.analysisYears ?? DEFAULT_ANALYSIS_YEARS;
+    const loanMonths = vals?.loanMonths ?? DEFAULT_LOAN_MONTHS;
+    const monthlyOpEx = vals?.monthlyOpEx ?? DEFAULT_MONTHLY_OPEX;
     const totalLoan = cashFlowResult.monthlyPayment * Math.min(loanMonths, analysisYears * 12);
     const totalOpEx = monthlyOpEx * 12 * analysisYears;
-    const optionCost = vals?.optionCost ?? 0;
+    const optionCost = vals?.optionCost ?? DEFAULT_OPTION_COST;
     const data = [
       { value: downPayment, name: "首付" },
       { value: taxAndInsurance, name: "税费杂费" },
