@@ -30,6 +30,8 @@ const DEFAULT_RESIDUAL_RATE = 0.4;
 const DEFAULT_OPTION_COST = 0;
 const DEFAULT_OPTION_RESIDUAL_RATE = 0.2;
 
+const INPUT_NUMBER_WIDTH = 260;
+
 function formatMoney(n: number) {
   return new Intl.NumberFormat("zh-CN", {
     style: "decimal",
@@ -344,7 +346,7 @@ const Home = () => {
             label="车价（元）"
             rules={[{ required: true, message: "请输入车价" }, { type: "number", min: 1, message: "车价须大于 0" }]}
           >
-            <InputNumber className="w-full" min={1} suffix="元" />
+            <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={1} suffix="元" />
           </Form.Item>
           <Form.Item
             name="depreciationRate3"
@@ -354,7 +356,13 @@ const Home = () => {
               { type: "number", min: 0, max: 1, message: "折旧率须在 0–1 之间" },
             ]}
           >
-            <InputNumber className="w-full" min={0} max={1} step={0.01} suffix="如 0.5 表示 50%" />
+            <InputNumber
+              style={{ width: INPUT_NUMBER_WIDTH }}
+              min={0}
+              max={1}
+              step={0.01}
+              suffix="如 0.5 表示 50%"
+            />
           </Form.Item>
           <Form.Item
             name="depreciationRate5"
@@ -364,7 +372,13 @@ const Home = () => {
               { type: "number", min: 0, max: 1, message: "折旧率须在 0–1 之间" },
             ]}
           >
-            <InputNumber className="w-full" min={0} max={1} step={0.01} suffix="如 0.6 表示 60%" />
+            <InputNumber
+              style={{ width: INPUT_NUMBER_WIDTH }}
+              min={0}
+              max={1}
+              step={0.01}
+              suffix="如 0.6 表示 60%"
+            />
           </Form.Item>
           <Form.Item
             name="depreciationRate8"
@@ -374,7 +388,13 @@ const Home = () => {
               { type: "number", min: 0, max: 1, message: "折旧率须在 0–1 之间" },
             ]}
           >
-            <InputNumber className="w-full" min={0} max={1} step={0.01} suffix="如 0.8 表示 80%" />
+            <InputNumber
+              style={{ width: INPUT_NUMBER_WIDTH }}
+              min={0}
+              max={1}
+              step={0.01}
+              suffix="如 0.8 表示 80%"
+            />
           </Form.Item>
           <div className="mb-4">
             <DepreciationHint />
@@ -384,21 +404,21 @@ const Home = () => {
             label="首年保险（元）"
             rules={[{ required: true, message: "请输入首年保险" }, { type: "number", min: 0, message: "不能为负" }]}
           >
-            <InputNumber className="w-full" min={0} suffix="元" />
+            <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
           </Form.Item>
           <Form.Item
             name="mileagePerYear"
             label="年里程（公里）"
             rules={[{ required: true, message: "请输入年里程" }, { type: "number", min: 1, message: "年里程须大于 0" }]}
           >
-            <InputNumber className="w-full" min={1} suffix="公里" />
+            <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={1} suffix="公里" />
           </Form.Item>
           <Form.Item
             name="parkingFeePerYear"
             label="年停车费（元/年）"
             rules={[{ type: "number", min: 0, message: "不能为负" }]}
           >
-            <InputNumber className="w-full" min={0} suffix="元/年" />
+            <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元/年" />
           </Form.Item>
           <Form.Item
             name="energyCostPerKm"
@@ -406,7 +426,12 @@ const Home = () => {
             rules={[{ type: "number", min: 0, message: "不能为负" }]}
             extra="仅供参考：油车约 0.5～0.9 元/公里，电车约 0.1～0.25 元/公里。"
           >
-            <InputNumber className="w-full" min={0} step={0.01} suffix="元/公里" />
+            <InputNumber
+              style={{ width: INPUT_NUMBER_WIDTH }}
+              min={0}
+              step={0.01}
+              suffix="元/公里"
+            />
           </Form.Item>
 
           <div className="mb-4 mt-4">
@@ -425,14 +450,14 @@ const Home = () => {
                         label="首付（元）"
                         rules={[{ required: true }, { type: "number", min: 0 }]}
                       >
-                        <InputNumber className="w-full" min={0} suffix="元" />
+                        <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
                       </Form.Item>
                       <Form.Item
                         name="taxAndInsurance"
                         label="购置税、首年保险等杂费（元）"
                         rules={[{ required: true }, { type: "number", min: 0 }]}
                       >
-                        <InputNumber className="w-full" min={0} suffix="元" />
+                        <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
                       </Form.Item>
                       <Form.Item
                         name="optionCost"
@@ -440,7 +465,7 @@ const Home = () => {
                         rules={[{ type: "number", min: 0 }]}
                         extra="购车时一次性支付。选配保值率多数低于车体，下方可单独填选配残值率。"
                       >
-                        <InputNumber className="w-full" min={0} suffix="元" />
+                        <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
                       </Form.Item>
                       <Form.Item
                         name="optionResidualRate"
@@ -448,42 +473,58 @@ const Home = () => {
                         rules={[{ type: "number", min: 0, max: 1 }]}
                         extra="选配在 N 年后的残值率，多数低于车辆本身，可填 0.15~0.25。"
                       >
-                        <InputNumber className="w-full" min={0} max={1} step={0.01} suffix="如 0.2 即 20%" />
+                        <InputNumber
+                          style={{ width: INPUT_NUMBER_WIDTH }}
+                          min={0}
+                          max={1}
+                          step={0.01}
+                          suffix="如 0.2 即 20%"
+                        />
                       </Form.Item>
                       <Form.Item
                         name="loanMonths"
                         label="贷款月数"
                         rules={[{ required: true }, { type: "number", min: 0 }]}
                       >
-                        <InputNumber className="w-full" min={0} suffix="月" />
+                        <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="月" />
                       </Form.Item>
                       <Form.Item
                         name="annualLoanRate"
                         label="贷款年化利率"
                         rules={[{ required: true }, { type: "number", min: 0 }]}
                       >
-                        <InputNumber className="w-full" min={0} step={0.01} suffix="如 0.03 即 3%" />
+                        <InputNumber
+                          style={{ width: INPUT_NUMBER_WIDTH }}
+                          min={0}
+                          step={0.01}
+                          suffix="如 0.03 即 3%"
+                        />
                       </Form.Item>
                       <Form.Item
                         name="monthlyOpEx"
                         label="月均养车费（元）"
                         rules={[{ required: true }, { type: "number", min: 0 }]}
                       >
-                        <InputNumber className="w-full" min={0} suffix="元" />
+                        <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
                       </Form.Item>
                       <Form.Item
                         name="marketReturnRate"
                         label="理财年化收益率（机会成本）"
                         rules={[{ required: true }, { type: "number", min: 0 }]}
                       >
-                        <InputNumber className="w-full" min={0} step={0.01} suffix="如 0.04 即 4%" />
+                        <InputNumber
+                          style={{ width: INPUT_NUMBER_WIDTH }}
+                          min={0}
+                          step={0.01}
+                          suffix="如 0.04 即 4%"
+                        />
                       </Form.Item>
                       <Form.Item
                         name="analysisYears"
                         label="分析年数"
                         rules={[{ required: true }, { type: "number", min: 1 }]}
                       >
-                        <InputNumber className="w-full" min={1} suffix="年" />
+                        <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={1} suffix="年" />
                       </Form.Item>
                       <Form.Item
                         name="residualRate"
@@ -493,7 +534,13 @@ const Home = () => {
                           { type: "number", min: 0, max: 1, message: "0~1 之间" },
                         ]}
                       >
-                        <InputNumber className="w-full" min={0} max={1} step={0.01} suffix="如 0.4 即 40%" />
+                        <InputNumber
+                          style={{ width: INPUT_NUMBER_WIDTH }}
+                          min={0}
+                          max={1}
+                          step={0.01}
+                          suffix="如 0.4 即 40%"
+                        />
                       </Form.Item>
                     </>
                   ),
