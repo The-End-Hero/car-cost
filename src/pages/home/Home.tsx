@@ -8,7 +8,7 @@ const Home = () => {
       initial={{ opacity: 0, filter: "blur(8px)" }}
       animate={{ opacity: 1, filter: "blur(0px)" }}
       exit={{ opacity: 0, filter: "blur(8px)" }}
-      transition={{ duration: 2 }}
+      transition={{ duration: 0.3 }}
     >
       <h1 className="text-4xl font-bold mb-4">Home Page</h1>
       <Link
