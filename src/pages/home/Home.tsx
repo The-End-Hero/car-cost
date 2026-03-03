@@ -4,7 +4,7 @@ import { useWatch } from "antd/es/form/Form";
 import { useEffect, useMemo, useRef } from "react";
 import * as echarts from "echarts";
 import { useThemeStore } from "@/stores/theme";
-import { calcCarCost } from "@/utils/carCost";
+import { calcCarCost, getAnnualPremiums } from "@/utils/carCost";
 import {
   calculateCarFinancial,
   type CarFinancialResult,
@@ -15,8 +15,10 @@ const DEFAULT_PRICE = 253900;
 const DEFAULT_RATE_3 = 0.5;
 const DEFAULT_RATE_5 = 0.6;
 const DEFAULT_RATE_8 = 0.8;
-const DEFAULT_INSURANCE = 7000;
+const DEFAULT_INSURANCE = 7500;
 const DEFAULT_MILEAGE = 12000;
+const DEFAULT_PARKING_FEE_PER_YEAR = 0;
+const DEFAULT_ENERGY_COST_PER_KM = 0.1;
 const DEFAULT_DOWN_PAYMENT = 90000;
 const DEFAULT_TAX_AND_INSURANCE = 30000;
 const DEFAULT_LOAN_MONTHS = 36;
@@ -43,6 +45,8 @@ interface FormValues {
   depreciationRate8: number;
   insuranceFirstYear: number;
   mileagePerYear: number;
+  parkingFeePerYear: number;
+  energyCostPerKm: number;
   downPayment: number;
   taxAndInsurance: number;
   loanMonths: number;
@@ -135,6 +139,8 @@ const Home = () => {
     const r8 = vals.depreciationRate8 ?? DEFAULT_RATE_8;
     const ins = vals.insuranceFirstYear ?? DEFAULT_INSURANCE;
     const mileage = vals.mileagePerYear ?? DEFAULT_MILEAGE;
+     const parkingFeePerYear = vals.parkingFeePerYear ?? DEFAULT_PARKING_FEE_PER_YEAR;
+     const energyCostPerKm = vals.energyCostPerKm ?? DEFAULT_ENERGY_COST_PER_KM;
     if (price <= 0 || ins <= 0 || mileage <= 0) return null;
     if (r3 < 0 || r3 > 1 || r5 < 0 || r5 > 1 || r8 < 0 || r8 > 1) return null;
     return calcCarCost({
@@ -144,6 +150,8 @@ const Home = () => {
       depreciationRate8: r8,
       insuranceFirstYear: ins,
       mileagePerYear: mileage,
+      parkingFeePerYear,
+      energyCostPerKm,
     });
   }, [formValues]);
 
@@ -317,6 +325,8 @@ const Home = () => {
               depreciationRate8: DEFAULT_RATE_8,
               insuranceFirstYear: DEFAULT_INSURANCE,
               mileagePerYear: DEFAULT_MILEAGE,
+              parkingFeePerYear: DEFAULT_PARKING_FEE_PER_YEAR,
+              energyCostPerKm: DEFAULT_ENERGY_COST_PER_KM,
               downPayment: DEFAULT_DOWN_PAYMENT,
               taxAndInsurance: DEFAULT_TAX_AND_INSURANCE,
               loanMonths: DEFAULT_LOAN_MONTHS,
@@ -334,7 +344,7 @@ const Home = () => {
             label="车价（元）"
             rules={[{ required: true, message: "请输入车价" }, { type: "number", min: 1, message: "车价须大于 0" }]}
           >
-            <InputNumber className="w-full" min={1} addonAfter="元" />
+            <InputNumber className="w-full" min={1} suffix="元" />
           </Form.Item>
           <Form.Item
             name="depreciationRate3"
@@ -344,7 +354,7 @@ const Home = () => {
               { type: "number", min: 0, max: 1, message: "折旧率须在 0–1 之间" },
             ]}
           >
-            <InputNumber className="w-full" min={0} max={1} step={0.01} addonAfter="如 0.5 表示 50%" />
+            <InputNumber className="w-full" min={0} max={1} step={0.01} suffix="如 0.5 表示 50%" />
           </Form.Item>
           <Form.Item
             name="depreciationRate5"
@@ -354,7 +364,7 @@ const Home = () => {
               { type: "number", min: 0, max: 1, message: "折旧率须在 0–1 之间" },
             ]}
           >
-            <InputNumber className="w-full" min={0} max={1} step={0.01} addonAfter="如 0.6 表示 60%" />
+            <InputNumber className="w-full" min={0} max={1} step={0.01} suffix="如 0.6 表示 60%" />
           </Form.Item>
           <Form.Item
             name="depreciationRate8"
@@ -364,7 +374,7 @@ const Home = () => {
               { type: "number", min: 0, max: 1, message: "折旧率须在 0–1 之间" },
             ]}
           >
-            <InputNumber className="w-full" min={0} max={1} step={0.01} addonAfter="如 0.8 表示 80%" />
+            <InputNumber className="w-full" min={0} max={1} step={0.01} suffix="如 0.8 表示 80%" />
           </Form.Item>
           <div className="mb-4">
             <DepreciationHint />
@@ -374,14 +384,29 @@ const Home = () => {
             label="首年保险（元）"
             rules={[{ required: true, message: "请输入首年保险" }, { type: "number", min: 0, message: "不能为负" }]}
           >
-            <InputNumber className="w-full" min={0} addonAfter="元" />
+            <InputNumber className="w-full" min={0} suffix="元" />
           </Form.Item>
           <Form.Item
             name="mileagePerYear"
             label="年里程（公里）"
             rules={[{ required: true, message: "请输入年里程" }, { type: "number", min: 1, message: "年里程须大于 0" }]}
           >
-            <InputNumber className="w-full" min={1} addonAfter="公里" />
+            <InputNumber className="w-full" min={1} suffix="公里" />
+          </Form.Item>
+          <Form.Item
+            name="parkingFeePerYear"
+            label="年停车费（元/年）"
+            rules={[{ type: "number", min: 0, message: "不能为负" }]}
+          >
+            <InputNumber className="w-full" min={0} suffix="元/年" />
+          </Form.Item>
+          <Form.Item
+            name="energyCostPerKm"
+            label="每公里能源费用"
+            rules={[{ type: "number", min: 0, message: "不能为负" }]}
+            extra="仅供参考：油车约 0.5～0.9 元/公里，电车约 0.1～0.25 元/公里。"
+          >
+            <InputNumber className="w-full" min={0} step={0.01} suffix="元/公里" />
           </Form.Item>
 
           <div className="mb-4 mt-4">
@@ -400,14 +425,14 @@ const Home = () => {
                         label="首付（元）"
                         rules={[{ required: true }, { type: "number", min: 0 }]}
                       >
-                        <InputNumber className="w-full" min={0} addonAfter="元" />
+                        <InputNumber className="w-full" min={0} suffix="元" />
                       </Form.Item>
                       <Form.Item
                         name="taxAndInsurance"
                         label="购置税、首年保险等杂费（元）"
                         rules={[{ required: true }, { type: "number", min: 0 }]}
                       >
-                        <InputNumber className="w-full" min={0} addonAfter="元" />
+                        <InputNumber className="w-full" min={0} suffix="元" />
                       </Form.Item>
                       <Form.Item
                         name="optionCost"
@@ -415,7 +440,7 @@ const Home = () => {
                         rules={[{ type: "number", min: 0 }]}
                         extra="购车时一次性支付。选配保值率多数低于车体，下方可单独填选配残值率。"
                       >
-                        <InputNumber className="w-full" min={0} addonAfter="元" />
+                        <InputNumber className="w-full" min={0} suffix="元" />
                       </Form.Item>
                       <Form.Item
                         name="optionResidualRate"
@@ -423,42 +448,42 @@ const Home = () => {
                         rules={[{ type: "number", min: 0, max: 1 }]}
                         extra="选配在 N 年后的残值率，多数低于车辆本身，可填 0.15~0.25。"
                       >
-                        <InputNumber className="w-full" min={0} max={1} step={0.01} addonAfter="如 0.2 即 20%" />
+                        <InputNumber className="w-full" min={0} max={1} step={0.01} suffix="如 0.2 即 20%" />
                       </Form.Item>
                       <Form.Item
                         name="loanMonths"
                         label="贷款月数"
                         rules={[{ required: true }, { type: "number", min: 0 }]}
                       >
-                        <InputNumber className="w-full" min={0} addonAfter="月" />
+                        <InputNumber className="w-full" min={0} suffix="月" />
                       </Form.Item>
                       <Form.Item
                         name="annualLoanRate"
                         label="贷款年化利率"
                         rules={[{ required: true }, { type: "number", min: 0 }]}
                       >
-                        <InputNumber className="w-full" min={0} step={0.01} addonAfter="如 0.03 即 3%" />
+                        <InputNumber className="w-full" min={0} step={0.01} suffix="如 0.03 即 3%" />
                       </Form.Item>
                       <Form.Item
                         name="monthlyOpEx"
                         label="月均养车费（元）"
                         rules={[{ required: true }, { type: "number", min: 0 }]}
                       >
-                        <InputNumber className="w-full" min={0} addonAfter="元" />
+                        <InputNumber className="w-full" min={0} suffix="元" />
                       </Form.Item>
                       <Form.Item
                         name="marketReturnRate"
                         label="理财年化收益率（机会成本）"
                         rules={[{ required: true }, { type: "number", min: 0 }]}
                       >
-                        <InputNumber className="w-full" min={0} step={0.01} addonAfter="如 0.04 即 4%" />
+                        <InputNumber className="w-full" min={0} step={0.01} suffix="如 0.04 即 4%" />
                       </Form.Item>
                       <Form.Item
                         name="analysisYears"
                         label="分析年数"
                         rules={[{ required: true }, { type: "number", min: 1 }]}
                       >
-                        <InputNumber className="w-full" min={1} addonAfter="年" />
+                        <InputNumber className="w-full" min={1} suffix="年" />
                       </Form.Item>
                       <Form.Item
                         name="residualRate"
@@ -468,7 +493,7 @@ const Home = () => {
                           { type: "number", min: 0, max: 1, message: "0~1 之间" },
                         ]}
                       >
-                        <InputNumber className="w-full" min={0} max={1} step={0.01} addonAfter="如 0.4 即 40%" />
+                        <InputNumber className="w-full" min={0} max={1} step={0.01} suffix="如 0.4 即 40%" />
                       </Form.Item>
                     </>
                   ),
@@ -483,6 +508,29 @@ const Home = () => {
               <Card size="small" title="3 年">
                 <Statistic title="折旧额" value={formatMoney(result.period3.depreciation)} suffix="元" />
                 <Statistic title="总保险" value={formatMoney(result.period3.totalInsurance)} suffix="元" />
+                <Statistic title="停车总额" value={formatMoney(result.period3.totalParking)} suffix="元" />
+                <Statistic title="能源总额" value={formatMoney(result.period3.totalEnergy)} suffix="元" />
+                <Collapse
+                  size="small"
+                  items={[
+                    {
+                      key: "ins3",
+                      label: "各年保费（NCD 递减）",
+                      children: (
+                        <div className="text-sm space-y-0.5">
+                          {getAnnualPremiums(
+                            (formValues?.insuranceFirstYear ?? DEFAULT_INSURANCE) as number,
+                            3
+                          ).map((p, i) => (
+                            <div key={i}>
+                              第 {i + 1} 年：{formatMoney(p)} 元
+                            </div>
+                          ))}
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
                 <Statistic title="综合成本" value={formatMoney(result.period3.totalCost)} suffix="元" />
                 <Statistic title="总里程" value={formatMoney(result.period3.totalMileage)} suffix="公里" />
                 <Statistic title="每公里成本" value={result.period3.costPerKm} suffix="元/公里" />
@@ -490,6 +538,29 @@ const Home = () => {
               <Card size="small" title="5 年">
                 <Statistic title="折旧额" value={formatMoney(result.period5.depreciation)} suffix="元" />
                 <Statistic title="总保险" value={formatMoney(result.period5.totalInsurance)} suffix="元" />
+                <Statistic title="停车总额" value={formatMoney(result.period5.totalParking)} suffix="元" />
+                <Statistic title="能源总额" value={formatMoney(result.period5.totalEnergy)} suffix="元" />
+                <Collapse
+                  size="small"
+                  items={[
+                    {
+                      key: "ins5",
+                      label: "各年保费（NCD 递减）",
+                      children: (
+                        <div className="text-sm space-y-0.5">
+                          {getAnnualPremiums(
+                            (formValues?.insuranceFirstYear ?? DEFAULT_INSURANCE) as number,
+                            5
+                          ).map((p, i) => (
+                            <div key={i}>
+                              第 {i + 1} 年：{formatMoney(p)} 元
+                            </div>
+                          ))}
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
                 <Statistic title="综合成本" value={formatMoney(result.period5.totalCost)} suffix="元" />
                 <Statistic title="总里程" value={formatMoney(result.period5.totalMileage)} suffix="公里" />
                 <Statistic title="每公里成本" value={result.period5.costPerKm} suffix="元/公里" />
@@ -497,6 +568,29 @@ const Home = () => {
               <Card size="small" title="8 年">
                 <Statistic title="折旧额" value={formatMoney(result.period8.depreciation)} suffix="元" />
                 <Statistic title="总保险" value={formatMoney(result.period8.totalInsurance)} suffix="元" />
+                <Statistic title="停车总额" value={formatMoney(result.period8.totalParking)} suffix="元" />
+                <Statistic title="能源总额" value={formatMoney(result.period8.totalEnergy)} suffix="元" />
+                <Collapse
+                  size="small"
+                  items={[
+                    {
+                      key: "ins8",
+                      label: "各年保费（NCD 递减）",
+                      children: (
+                        <div className="text-sm space-y-0.5">
+                          {getAnnualPremiums(
+                            (formValues?.insuranceFirstYear ?? DEFAULT_INSURANCE) as number,
+                            8
+                          ).map((p, i) => (
+                            <div key={i}>
+                              第 {i + 1} 年：{formatMoney(p)} 元
+                            </div>
+                          ))}
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
                 <Statistic title="综合成本" value={formatMoney(result.period8.totalCost)} suffix="元" />
                 <Statistic title="总里程" value={formatMoney(result.period8.totalMileage)} suffix="公里" />
                 <Statistic title="每公里成本" value={result.period8.costPerKm} suffix="元/公里" />
