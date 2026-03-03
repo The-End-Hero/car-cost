@@ -3,15 +3,19 @@ import Home from "@/pages/home/Home.tsx";
 import "./App.css";
 import { AnimatePresence } from "motion/react";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
+import { Footer } from "@/components/Footer";
 
 function App() {
   return (
     <HashRouter>
-      <div className="min-h-screen">
+      <div className="min-h-screen flex flex-col">
         <div className="fixed top-4 right-4 z-50">
           <ThemeSwitch />
         </div>
-        <AppContent />
+        <main className="flex-1">
+          <AppContent />
+        </main>
+        <Footer />
       </div>
     </HashRouter>
   );
