@@ -56,10 +56,11 @@ export interface CarFinancialResult {
 }
 
 /**
- * 等额本息月供
+ * 等额本息月供（annuity / equal installment，每期还款额固定）
  * 公式: P * r * (1+r)^n / ((1+r)^n - 1)
+ * 注：若后续增加等额本金（equal principal）还款方式，请另写函数区分。
  */
-function monthlyPaymentEqualPrincipal(
+function monthlyPaymentAnnuity(
   principal: number,
   annualRate: number,
   months: number
@@ -99,7 +100,7 @@ export function calculateCarFinancial(
   const loanAmount = Math.max(0, price - downPayment);
   const monthlyPay =
     loanAmount > 0 && loanMonths > 0
-      ? monthlyPaymentEqualPrincipal(loanAmount, annualLoanRate, loanMonths)
+      ? monthlyPaymentAnnuity(loanAmount, annualLoanRate, loanMonths)
       : 0;
 
   const initialOutflow = downPayment + taxAndInsurance + optionCost;
