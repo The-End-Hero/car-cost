@@ -19,6 +19,7 @@ const DEFAULT_INSURANCE = 7500;
 const DEFAULT_MILEAGE = 12000;
 const DEFAULT_PARKING_FEE_PER_YEAR = 0;
 const DEFAULT_ENERGY_COST_PER_KM = 0.1;
+const DEFAULT_PURCHASE_TAX = 0;
 const DEFAULT_DOWN_PAYMENT = 90000;
 const DEFAULT_TAX_AND_INSURANCE = 30000;
 const DEFAULT_LOAN_MONTHS = 36;
@@ -46,6 +47,8 @@ interface FormValues {
   depreciationRate5: number;
   depreciationRate8: number;
   insuranceFirstYear: number;
+  /** 购置税等一次性支出（元），仅用于综合成本模块 */
+  purchaseTax: number;
   mileagePerYear: number;
   parkingFeePerYear: number;
   energyCostPerKm: number;
@@ -140,6 +143,7 @@ const Home = () => {
     const r5 = vals.depreciationRate5 ?? DEFAULT_RATE_5;
     const r8 = vals.depreciationRate8 ?? DEFAULT_RATE_8;
     const ins = vals.insuranceFirstYear ?? DEFAULT_INSURANCE;
+    const purchaseTax = vals.purchaseTax ?? DEFAULT_PURCHASE_TAX;
     const mileage = vals.mileagePerYear ?? DEFAULT_MILEAGE;
      const parkingFeePerYear = vals.parkingFeePerYear ?? DEFAULT_PARKING_FEE_PER_YEAR;
      const energyCostPerKm = vals.energyCostPerKm ?? DEFAULT_ENERGY_COST_PER_KM;
@@ -154,6 +158,7 @@ const Home = () => {
       mileagePerYear: mileage,
       parkingFeePerYear,
       energyCostPerKm,
+      purchaseTax,
     });
   }, [formValues]);
 
@@ -326,6 +331,7 @@ const Home = () => {
               depreciationRate5: DEFAULT_RATE_5,
               depreciationRate8: DEFAULT_RATE_8,
               insuranceFirstYear: DEFAULT_INSURANCE,
+              purchaseTax: DEFAULT_PURCHASE_TAX,
               mileagePerYear: DEFAULT_MILEAGE,
               parkingFeePerYear: DEFAULT_PARKING_FEE_PER_YEAR,
               energyCostPerKm: DEFAULT_ENERGY_COST_PER_KM,
@@ -403,6 +409,14 @@ const Home = () => {
             name="insuranceFirstYear"
             label="首年保险（元）"
             rules={[{ required: true, message: "请输入首年保险" }, { type: "number", min: 0, message: "不能为负" }]}
+          >
+            <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
+          </Form.Item>
+          <Form.Item
+            name="purchaseTax"
+            label="购置税（元，一次性）"
+            rules={[{ type: "number", min: 0, message: "不能为负" }]}
+            extra="仅计入综合成本模块，默认 0 元。"
           >
             <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
           </Form.Item>
@@ -555,8 +569,6 @@ const Home = () => {
               <Card size="small" title="3 年">
                 <Statistic title="折旧额" value={formatMoney(result.period3.depreciation)} suffix="元" />
                 <Statistic title="总保险" value={formatMoney(result.period3.totalInsurance)} suffix="元" />
-                <Statistic title="停车总额" value={formatMoney(result.period3.totalParking)} suffix="元" />
-                <Statistic title="能源总额" value={formatMoney(result.period3.totalEnergy)} suffix="元" />
                 <Collapse
                   size="small"
                   items={[
@@ -578,6 +590,8 @@ const Home = () => {
                     },
                   ]}
                 />
+                <Statistic title="停车总额" value={formatMoney(result.period3.totalParking)} suffix="元" />
+                <Statistic title="能源总额" value={formatMoney(result.period3.totalEnergy)} suffix="元" />
                 <Statistic title="综合成本" value={formatMoney(result.period3.totalCost)} suffix="元" />
                 <Statistic title="总里程" value={formatMoney(result.period3.totalMileage)} suffix="公里" />
                 <Statistic title="每公里成本" value={result.period3.costPerKm} suffix="元/公里" />
@@ -585,8 +599,6 @@ const Home = () => {
               <Card size="small" title="5 年">
                 <Statistic title="折旧额" value={formatMoney(result.period5.depreciation)} suffix="元" />
                 <Statistic title="总保险" value={formatMoney(result.period5.totalInsurance)} suffix="元" />
-                <Statistic title="停车总额" value={formatMoney(result.period5.totalParking)} suffix="元" />
-                <Statistic title="能源总额" value={formatMoney(result.period5.totalEnergy)} suffix="元" />
                 <Collapse
                   size="small"
                   items={[
@@ -608,6 +620,8 @@ const Home = () => {
                     },
                   ]}
                 />
+                <Statistic title="停车总额" value={formatMoney(result.period5.totalParking)} suffix="元" />
+                <Statistic title="能源总额" value={formatMoney(result.period5.totalEnergy)} suffix="元" />
                 <Statistic title="综合成本" value={formatMoney(result.period5.totalCost)} suffix="元" />
                 <Statistic title="总里程" value={formatMoney(result.period5.totalMileage)} suffix="公里" />
                 <Statistic title="每公里成本" value={result.period5.costPerKm} suffix="元/公里" />
@@ -615,8 +629,6 @@ const Home = () => {
               <Card size="small" title="8 年">
                 <Statistic title="折旧额" value={formatMoney(result.period8.depreciation)} suffix="元" />
                 <Statistic title="总保险" value={formatMoney(result.period8.totalInsurance)} suffix="元" />
-                <Statistic title="停车总额" value={formatMoney(result.period8.totalParking)} suffix="元" />
-                <Statistic title="能源总额" value={formatMoney(result.period8.totalEnergy)} suffix="元" />
                 <Collapse
                   size="small"
                   items={[
@@ -638,6 +650,8 @@ const Home = () => {
                     },
                   ]}
                 />
+                <Statistic title="停车总额" value={formatMoney(result.period8.totalParking)} suffix="元" />
+                <Statistic title="能源总额" value={formatMoney(result.period8.totalEnergy)} suffix="元" />
                 <Statistic title="综合成本" value={formatMoney(result.period8.totalCost)} suffix="元" />
                 <Statistic title="总里程" value={formatMoney(result.period8.totalMileage)} suffix="公里" />
                 <Statistic title="每公里成本" value={result.period8.costPerKm} suffix="元/公里" />

@@ -13,6 +13,8 @@ export interface CarCostInput {
   depreciationRate5: number;
   /** 8 年折旧率，0-1 小数 */
   depreciationRate8: number;
+  /** 购置税等一次性支出（元），默认 0，视为在购车当年一次性发生，但计入各期累计成本中 */
+  purchaseTax?: number;
   /** 首年保险（元） */
   insuranceFirstYear: number;
   /** 年里程（公里） */
@@ -126,6 +128,7 @@ export function calcCarCost(input: CarCostInput): CarCostResult {
     depreciationRate3,
     depreciationRate5,
     depreciationRate8,
+    purchaseTax,
     insuranceFirstYear,
     mileagePerYear,
     parkingFeePerYear,
@@ -152,9 +155,12 @@ export function calcCarCost(input: CarCostInput): CarCostResult {
   const energy5 = annualEnergyCost * 5;
   const energy8 = annualEnergyCost * 8;
 
-  const totalCost3 = dep3 + ins3 + parking3 + energy3;
-  const totalCost5 = dep5 + ins5 + parking5 + energy5;
-  const totalCost8 = dep8 + ins8 + parking8 + energy8;
+  // 一次性购置税视为购车当年发生，但在 3/5/8 年累计成本中均只计算这一笔
+  const oneTimePurchaseTax = purchaseTax ?? 0;
+
+  const totalCost3 = dep3 + ins3 + parking3 + energy3 + oneTimePurchaseTax;
+  const totalCost5 = dep5 + ins5 + parking5 + energy5 + oneTimePurchaseTax;
+  const totalCost8 = dep8 + ins8 + parking8 + energy8 + oneTimePurchaseTax;
 
   const mileage3 = mileagePerYear * 3;
   const mileage5 = mileagePerYear * 5;
