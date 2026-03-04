@@ -2,7 +2,7 @@
  * 汽车综合使用成本计算
  * 使用 mathjs 进行数值运算（round 等），保证结果精度一致
  */
-import { round } from "mathjs";
+import { add, divide, max, multiply, round, subtract } from "mathjs";
 
 export interface CarCostInput {
   /** 车价（元） */
@@ -70,11 +70,11 @@ export function calculateAnnualPremium(
   yearsWithoutClaim: number,
   config: InsuranceNcdConfig
 ): number {
-  const currentNCD = Math.max(
+  const currentNCD = max(
     config.minNCD,
-    config.initialNCD - yearsWithoutClaim * config.discountStep
-  );
-  return round(config.basePremium * currentNCD);
+    subtract(config.initialNCD, multiply(yearsWithoutClaim, config.discountStep))
+  ) as number;
+  return round(multiply(config.basePremium, currentNCD)) as number;
 }
 
 /**
@@ -93,9 +93,9 @@ function totalInsuranceNcd(
   };
   let total = 0;
   for (let t = 0; t < years; t++) {
-    total += calculateAnnualPremium(t, fullConfig);
+    total = add(total, calculateAnnualPremium(t, fullConfig)) as number;
   }
-  return round(total);
+  return round(total) as number;
 }
 
 /**
@@ -135,40 +135,54 @@ export function calcCarCost(input: CarCostInput): CarCostResult {
     energyCostPerKm,
   } = input;
 
-  const dep3 = round(price * depreciationRate3);
-  const dep5 = round(price * depreciationRate5);
-  const dep8 = round(price * depreciationRate8);
+  const dep3 = round(multiply(price, depreciationRate3)) as number;
+  const dep5 = round(multiply(price, depreciationRate5)) as number;
+  const dep8 = round(multiply(price, depreciationRate8)) as number;
 
   const ins3 = totalInsuranceNcd(insuranceFirstYear, 3);
   const ins5 = totalInsuranceNcd(insuranceFirstYear, 5);
   const ins8 = totalInsuranceNcd(insuranceFirstYear, 8);
 
   const annualParking = parkingFeePerYear ?? 0;
-  const annualEnergyCost =
-    (mileagePerYear ?? 0) * (energyCostPerKm ?? 0);
+  const annualEnergyCost = multiply(
+    mileagePerYear ?? 0,
+    energyCostPerKm ?? 0
+  ) as number;
 
-  const parking3 = annualParking * 3;
-  const parking5 = annualParking * 5;
-  const parking8 = annualParking * 8;
+  const parking3 = multiply(annualParking, 3) as number;
+  const parking5 = multiply(annualParking, 5) as number;
+  const parking8 = multiply(annualParking, 8) as number;
 
-  const energy3 = annualEnergyCost * 3;
-  const energy5 = annualEnergyCost * 5;
-  const energy8 = annualEnergyCost * 8;
+  const energy3 = multiply(annualEnergyCost, 3) as number;
+  const energy5 = multiply(annualEnergyCost, 5) as number;
+  const energy8 = multiply(annualEnergyCost, 8) as number;
 
   // 一次性购置税视为购车当年发生，但在 3/5/8 年累计成本中均只计算这一笔
   const oneTimePurchaseTax = purchaseTax ?? 0;
 
-  const totalCost3 = dep3 + ins3 + parking3 + energy3 + oneTimePurchaseTax;
-  const totalCost5 = dep5 + ins5 + parking5 + energy5 + oneTimePurchaseTax;
-  const totalCost8 = dep8 + ins8 + parking8 + energy8 + oneTimePurchaseTax;
+  const totalCost3 = add(
+    add(add(add(dep3, ins3), parking3), energy3),
+    oneTimePurchaseTax
+  ) as number;
+  const totalCost5 = add(
+    add(add(add(dep5, ins5), parking5), energy5),
+    oneTimePurchaseTax
+  ) as number;
+  const totalCost8 = add(
+    add(add(add(dep8, ins8), parking8), energy8),
+    oneTimePurchaseTax
+  ) as number;
 
-  const mileage3 = mileagePerYear * 3;
-  const mileage5 = mileagePerYear * 5;
-  const mileage8 = mileagePerYear * 8;
+  const mileage3 = multiply(mileagePerYear, 3) as number;
+  const mileage5 = multiply(mileagePerYear, 5) as number;
+  const mileage8 = multiply(mileagePerYear, 8) as number;
 
-  const costPerKm3 = mileage3 > 0 ? round(totalCost3 / mileage3, 2) : 0;
-  const costPerKm5 = mileage5 > 0 ? round(totalCost5 / mileage5, 2) : 0;
-  const costPerKm8 = mileage8 > 0 ? round(totalCost8 / mileage8, 2) : 0;
+  const costPerKm3 =
+    mileage3 > 0 ? (round(divide(totalCost3, mileage3), 2) as number) : 0;
+  const costPerKm5 =
+    mileage5 > 0 ? (round(divide(totalCost5, mileage5), 2) as number) : 0;
+  const costPerKm8 =
+    mileage8 > 0 ? (round(divide(totalCost8, mileage8), 2) as number) : 0;
 
   return {
     period3: {

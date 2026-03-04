@@ -10,6 +10,7 @@ import {
   type CarFinancialResult,
 } from "@/utils/carFinancialAnalyzer";
 import { domToPng } from "modern-screenshot";
+import { add, divide, min, max, multiply, round, subtract } from "mathjs";
 
 const DEFAULT_PRICE = 253900;
 const DEFAULT_RATE_3 = 0.5;
@@ -170,7 +171,10 @@ const Home = () => {
     const marketReturnRate = vals.marketReturnRate ?? DEFAULT_MARKET_RETURN_RATE;
     const analysisYears = vals.analysisYears ?? DEFAULT_ANALYSIS_YEARS;
     const depreciationRate5 = vals.depreciationRate5 ?? DEFAULT_RATE_5;
-    const residualRate = Math.min(1, Math.max(0, 1 - depreciationRate5));
+    const residualRate = min(
+      1,
+      max(0, subtract(1, depreciationRate5) as number)
+    ) as number;
     const optionCost = vals.optionCost ?? DEFAULT_OPTION_COST;
     const optionResidualRate = vals.optionResidualRate ?? DEFAULT_OPTION_RESIDUAL_RATE;
     if (
@@ -233,19 +237,29 @@ const Home = () => {
     const years = s.map((p) => p.year);
     const totalOutflow = s.map((p) => p.totalOutflow);
     const opportunityCostWealth = s.map((p) => p.opportunityCostWealth);
-    const totalResidual =
-      summary.vehicleResidual + summary.optionResidual;
+    const totalResidual = add(
+      summary.vehicleResidual,
+      summary.optionResidual
+    ) as number;
     const residualLine = s.map(() => totalResidual);
     const netWealthLoss = s.map((p) => p.netWealthLoss);
     chart.setOption({
       tooltip: {
         trigger: "axis",
-        valueFormatter: (value: number) => `${(value / 10000).toFixed(2)} 万元`,
+        valueFormatter: (value: number) =>
+        `${round(divide(value, 10000), 2)} 万元`,
       },
       legend: { data: ["累计名义支出", "机会成本财富", "总残值（车辆+选配）", "净财富缩水"], bottom: 0 },
       grid: { left: "3%", right: "4%", bottom: "15%", top: "10%", containLabel: true },
       xAxis: { type: "category", data: years, name: "年" },
-      yAxis: { type: "value", name: "元", axisLabel: { formatter: (v: number) => `${Number(v) / 10000}万` } },
+      yAxis: {
+        type: "value",
+        name: "元",
+        axisLabel: {
+          formatter: (v: number) =>
+            `${divide(Number(v), 10000)}万`,
+        },
+      },
       series: [
         { name: "累计名义支出", type: "line", data: totalOutflow, smooth: true },
         { name: "机会成本财富", type: "line", data: opportunityCostWealth, smooth: true },
@@ -267,8 +281,14 @@ const Home = () => {
     const analysisYears = vals?.analysisYears ?? DEFAULT_ANALYSIS_YEARS;
     const loanMonths = vals?.loanMonths ?? DEFAULT_LOAN_MONTHS;
     const monthlyOpEx = vals?.monthlyOpEx ?? DEFAULT_MONTHLY_OPEX;
-    const totalLoan = cashFlowResult.monthlyPayment * Math.min(loanMonths, analysisYears * 12);
-    const totalOpEx = monthlyOpEx * 12 * analysisYears;
+    const totalLoan = multiply(
+      cashFlowResult.monthlyPayment,
+      min(loanMonths, multiply(analysisYears, 12) as number)
+    ) as number;
+    const totalOpEx = multiply(
+      multiply(monthlyOpEx, 12),
+      analysisYears
+    ) as number;
     const optionCost = vals?.optionCost ?? DEFAULT_OPTION_COST;
     const data = [
       { value: downPayment, name: "首付" },
@@ -280,7 +300,8 @@ const Home = () => {
     chart.setOption({
       tooltip: {
         trigger: "item",
-        valueFormatter: (value: number) => `${(value / 10000).toFixed(2)} 万元`,
+        valueFormatter: (value: number) =>
+        `${round(divide(value, 10000), 2)} 万元`,
       },
       legend: { orient: "vertical", right: 10, top: "center" },
       series: [
@@ -642,7 +663,10 @@ const Home = () => {
                   <Statistic
                     title="总残值（车辆+选配）"
                     value={formatMoney(
-                      cashFlowResult.summary.vehicleResidual + cashFlowResult.summary.optionResidual
+                      add(
+                        cashFlowResult.summary.vehicleResidual,
+                        cashFlowResult.summary.optionResidual
+                      ) as number
                     )}
                     suffix="元"
                   />

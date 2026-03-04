@@ -1,7 +1,9 @@
 /**
  * 购车现金流与机会成本分析器
  * 将汽车视为贬值资产，对比与投资增值资产的机会成本差额
+ * 使用 mathjs 进行数值运算，保证结果精度一致
  */
+import { add, divide, max, multiply, pow, subtract } from "mathjs";
 
 export interface CarFinancialAnalyzerInput {
   /** 车价（元） */
@@ -66,9 +68,12 @@ function monthlyPaymentAnnuity(
   months: number
 ): number {
   if (principal <= 0 || months <= 0) return 0;
-  const r = annualRate / 12;
-  const factor = Math.pow(1 + r, months);
-  return (principal * r * factor) / (factor - 1);
+  const r = divide(annualRate, 12) as number;
+  const factor = pow(add(1, r), months) as number;
+  return divide(
+    multiply(multiply(principal, r), factor),
+    subtract(factor, 1)
+  ) as number;
 }
 
 /**
@@ -95,52 +100,78 @@ export function calculateCarFinancial(
   const optionResidualRate = input.optionResidualRate ?? 0.2;
   const totalResidualRate = optionCost > 0 ? optionResidualRate : 0;
 
-  const months = analysisYears * 12;
-  const monthlyInvRate = marketReturnRate / 12;
-  const loanAmount = Math.max(0, price - downPayment);
+  const months = multiply(analysisYears, 12) as number;
+  const monthlyInvRate = divide(marketReturnRate, 12) as number;
+  const loanAmount = max(0, subtract(price, downPayment)) as number;
   const monthlyPay =
     loanAmount > 0 && loanMonths > 0
       ? monthlyPaymentAnnuity(loanAmount, annualLoanRate, loanMonths)
       : 0;
 
-  const initialOutflow = downPayment + taxAndInsurance + optionCost;
+  const initialOutflow = add(
+    add(downPayment, taxAndInsurance),
+    optionCost
+  ) as number;
   let totalNominalOutflow = initialOutflow;
   let opportunityCostWealth = initialOutflow;
 
-  const finalVehicleValue = price * residualRate;
-  const finalOptionResidual = optionCost * totalResidualRate;
-  const totalFinalResidual = finalVehicleValue + finalOptionResidual;
+  const finalVehicleValue = multiply(price, residualRate) as number;
+  const finalOptionResidual = multiply(
+    optionCost,
+    totalResidualRate
+  ) as number;
+  const totalFinalResidual = add(
+    finalVehicleValue,
+    finalOptionResidual
+  ) as number;
 
   const series: CashFlowSeriesPoint[] = [
     {
       year: 0,
       totalOutflow: totalNominalOutflow,
       opportunityCostWealth,
-      netWealthLoss: opportunityCostWealth - totalFinalResidual,
+      netWealthLoss: subtract(
+        opportunityCostWealth,
+        totalFinalResidual
+      ) as number,
     },
   ];
 
   for (let m = 1; m <= months; m++) {
     const loanPay = m <= loanMonths ? monthlyPay : 0;
-    const currentMonthOutflow = loanPay + monthlyOpEx;
-    totalNominalOutflow += currentMonthOutflow;
-    opportunityCostWealth =
-      opportunityCostWealth * (1 + monthlyInvRate) + currentMonthOutflow;
+    const currentMonthOutflow = add(loanPay, monthlyOpEx) as number;
+    totalNominalOutflow = add(
+      totalNominalOutflow,
+      currentMonthOutflow
+    ) as number;
+    opportunityCostWealth = add(
+      multiply(opportunityCostWealth, add(1, monthlyInvRate)),
+      currentMonthOutflow
+    ) as number;
 
     if (m % 12 === 0) {
-      const year = m / 12;
+      const year = divide(m, 12) as number;
       series.push({
         year,
         totalOutflow: totalNominalOutflow,
         opportunityCostWealth,
-        netWealthLoss: opportunityCostWealth - totalFinalResidual,
+        netWealthLoss: subtract(
+          opportunityCostWealth,
+          totalFinalResidual
+        ) as number,
       });
     }
   }
 
-  const netWealthLoss = opportunityCostWealth - totalFinalResidual;
-  const lostInvestmentGain = opportunityCostWealth - totalNominalOutflow;
-  const costPerYear = netWealthLoss / analysisYears;
+  const netWealthLoss = subtract(
+    opportunityCostWealth,
+    totalFinalResidual
+  ) as number;
+  const lostInvestmentGain = subtract(
+    opportunityCostWealth,
+    totalNominalOutflow
+  ) as number;
+  const costPerYear = divide(netWealthLoss, analysisYears) as number;
 
   return {
     summary: {
@@ -152,7 +183,7 @@ export function calculateCarFinancial(
     },
     efficiency: {
       annualCost: costPerYear,
-      monthlyCost: costPerYear / 12,
+      monthlyCost: divide(costPerYear, 12) as number,
     },
     series,
     monthlyPayment: monthlyPay,
