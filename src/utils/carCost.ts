@@ -127,6 +127,44 @@ export function getAnnualPremiums(
   return arr;
 }
 
+/** 月均养车费计算说明，供 UI 展示 */
+export const MONTHLY_OPEX_CALC_DESCRIPTION =
+  "由年停车费、年保养费、年保险费（3 年平均）、年事故违章费、年能源费合计后 ÷12 得出，用于现金流与机会成本分析。";
+
+export interface MonthlyOpExFromAnnualParams {
+  insuranceFirstYear: number;
+  parkingFeePerYear?: number;
+  maintenanceFeePerYear?: number;
+  violationAccidentFeePerYear?: number;
+  mileagePerYear: number;
+  energyCostPerKm?: number;
+}
+
+/**
+ * 根据年度费用计算月均养车费（不含折旧与购置税）
+ * 年养车费 = 年停车费 + 年保养费 + 年保险费(3年平均) + 年事故违章费 + 年能源费；月均 = 年养车费 / 12
+ */
+export function calcMonthlyOpExFromAnnual(params: MonthlyOpExFromAnnualParams): number {
+  const {
+    insuranceFirstYear,
+    parkingFeePerYear = 0,
+    maintenanceFeePerYear = 0,
+    violationAccidentFeePerYear = 0,
+    mileagePerYear,
+    energyCostPerKm = 0,
+  } = params;
+  const annualInsurance = totalInsuranceNcd(insuranceFirstYear, 3) / 3;
+  const annualEnergy = multiply(mileagePerYear, energyCostPerKm) as number;
+  const annualTotal = add(
+    add(
+      add(add(parkingFeePerYear, maintenanceFeePerYear), annualInsurance),
+      violationAccidentFeePerYear
+    ),
+    annualEnergy
+  ) as number;
+  return round(divide(annualTotal, 12), 2) as number;
+}
+
 /**
  * 根据输入计算 3/5/8 年折旧、总保险（NCD 按年递减）、综合成本与每公里成本
  */

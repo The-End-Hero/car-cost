@@ -4,7 +4,12 @@ import { useWatch } from "antd/es/form/Form";
 import { useEffect, useMemo, useRef } from "react";
 import * as echarts from "echarts";
 import { useThemeStore } from "@/stores/theme";
-import { calcCarCost, getAnnualPremiums } from "@/utils/carCost";
+import {
+  calcCarCost,
+  calcMonthlyOpExFromAnnual,
+  getAnnualPremiums,
+  MONTHLY_OPEX_CALC_DESCRIPTION,
+} from "@/utils/carCost";
 import {
   calculateCarFinancial,
   type CarFinancialResult,
@@ -26,7 +31,6 @@ const DEFAULT_INITIAL_ONE_TIME_FEE = 10000;
 const DEFAULT_DOWN_PAYMENT = 90000;
 const DEFAULT_LOAN_MONTHS = 36;
 const DEFAULT_ANNUAL_LOAN_RATE = 0.03;
-const DEFAULT_MONTHLY_OPEX = 2500;
 const DEFAULT_MARKET_RETURN_RATE = 0.04;
 const DEFAULT_ANALYSIS_YEARS = 5;
 const DEFAULT_OPTION_COST = 0;
@@ -58,7 +62,8 @@ interface FormValues {
   downPayment: number;
   loanMonths: number;
   annualLoanRate: number;
-  monthlyOpEx: number;
+  /** 由年度费用自动计算，仅展示用，不参与表单提交 */
+  monthlyOpEx?: number;
   marketReturnRate: number;
   analysisYears: number;
   optionCost: number;
@@ -167,6 +172,20 @@ const Home = () => {
     });
   }, [formValues]);
 
+  const computedMonthlyOpEx = useMemo(() => {
+    const vals = formValues as Partial<FormValues> | undefined;
+    if (!vals || typeof vals !== "object") return 0;
+    return calcMonthlyOpExFromAnnual({
+      insuranceFirstYear: vals.insuranceFirstYear ?? DEFAULT_INSURANCE,
+      parkingFeePerYear: vals.parkingFeePerYear ?? DEFAULT_PARKING_FEE_PER_YEAR,
+      maintenanceFeePerYear: vals.maintenanceFeePerYear ?? DEFAULT_MAINTENANCE_FEE_PER_YEAR,
+      violationAccidentFeePerYear:
+        vals.violationAccidentFeePerYear ?? DEFAULT_VIOLATION_ACCIDENT_FEE_PER_YEAR,
+      mileagePerYear: vals.mileagePerYear ?? DEFAULT_MILEAGE,
+      energyCostPerKm: vals.energyCostPerKm ?? DEFAULT_ENERGY_COST_PER_KM,
+    });
+  }, [formValues]);
+
   const cashFlowResult = useMemo((): CarFinancialResult | null => {
     const vals = formValues as Partial<FormValues> | undefined;
     if (!vals || typeof vals !== "object") return null;
@@ -175,7 +194,6 @@ const Home = () => {
     const initialOneTimeFee = vals.initialOneTimeFee ?? DEFAULT_INITIAL_ONE_TIME_FEE;
     const loanMonths = vals.loanMonths ?? DEFAULT_LOAN_MONTHS;
     const annualLoanRate = vals.annualLoanRate ?? DEFAULT_ANNUAL_LOAN_RATE;
-    const monthlyOpEx = vals.monthlyOpEx ?? DEFAULT_MONTHLY_OPEX;
     const marketReturnRate = vals.marketReturnRate ?? DEFAULT_MARKET_RETURN_RATE;
     const analysisYears = vals.analysisYears ?? DEFAULT_ANALYSIS_YEARS;
     const depreciationRate5 = vals.depreciationRate5 ?? DEFAULT_RATE_5;
@@ -190,7 +208,7 @@ const Home = () => {
       downPayment < 0 ||
       initialOneTimeFee < 0 ||
       loanMonths < 0 ||
-      monthlyOpEx < 0 ||
+      computedMonthlyOpEx < 0 ||
       analysisYears < 1 ||
       optionCost < 0 ||
       (optionCost > 0 && (optionResidualRate < 0 || optionResidualRate > 1))
@@ -203,7 +221,7 @@ const Home = () => {
         taxAndInsurance: initialOneTimeFee,
         loanMonths,
         annualLoanRate,
-        monthlyOpEx,
+        monthlyOpEx: computedMonthlyOpEx,
         residualRate,
         marketReturnRate,
         optionCost: optionCost > 0 ? optionCost : undefined,
@@ -211,7 +229,7 @@ const Home = () => {
       },
       analysisYears
     );
-  }, [formValues]);
+  }, [formValues, computedMonthlyOpEx]);
 
   const reportRef = useRef<HTMLDivElement>(null);
   const saveReportBtnRef = useRef<HTMLButtonElement>(null);
@@ -288,13 +306,12 @@ const Home = () => {
     const initialOneTimeFee = vals?.initialOneTimeFee ?? DEFAULT_INITIAL_ONE_TIME_FEE;
     const analysisYears = vals?.analysisYears ?? DEFAULT_ANALYSIS_YEARS;
     const loanMonths = vals?.loanMonths ?? DEFAULT_LOAN_MONTHS;
-    const monthlyOpEx = vals?.monthlyOpEx ?? DEFAULT_MONTHLY_OPEX;
     const totalLoan = multiply(
       cashFlowResult.monthlyPayment,
       min(loanMonths, multiply(analysisYears, 12) as number)
     ) as number;
     const totalOpEx = multiply(
-      multiply(monthlyOpEx, 12),
+      multiply(computedMonthlyOpEx, 12),
       analysisYears
     ) as number;
     const optionCost = vals?.optionCost ?? DEFAULT_OPTION_COST;
@@ -325,7 +342,7 @@ const Home = () => {
     return () => {
       chart.dispose();
     };
-  }, [cashFlowResult, formValues, isDark]);
+  }, [cashFlowResult, formValues, computedMonthlyOpEx, isDark]);
 
   return (
     <motion.div
@@ -364,7 +381,6 @@ const Home = () => {
               downPayment: DEFAULT_DOWN_PAYMENT,
               loanMonths: DEFAULT_LOAN_MONTHS,
               annualLoanRate: DEFAULT_ANNUAL_LOAN_RATE,
-              monthlyOpEx: DEFAULT_MONTHLY_OPEX,
               marketReturnRate: DEFAULT_MARKET_RETURN_RATE,
               analysisYears: DEFAULT_ANALYSIS_YEARS,
               optionCost: DEFAULT_OPTION_COST,
@@ -540,12 +556,13 @@ const Home = () => {
               />
             </Form.Item>
             <Form.Item
-              name="monthlyOpEx"
               label="月均养车费（元）"
-              rules={[{ required: true }, { type: "number", min: 0 }]}
-              extra="包含油/电、停车、保险、保养、洗车等全部月均支出总和，用于现金流与机会成本分析。"
+              extra={MONTHLY_OPEX_CALC_DESCRIPTION}
             >
-              <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
+              <span className="text-base">
+                {formatMoney(computedMonthlyOpEx)} 元
+                <span className="ml-2 text-gray-500 dark:text-gray-400 text-sm">（自动计算）</span>
+              </span>
             </Form.Item>
             <Form.Item
               name="marketReturnRate"
