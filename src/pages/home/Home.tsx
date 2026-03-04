@@ -442,13 +442,6 @@ const Home = () => {
             <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={1} suffix="公里" />
           </Form.Item>
           <Form.Item
-            name="parkingFeePerYear"
-            label="年停车费（元/年）"
-            rules={[{ type: "number", min: 0, message: "不能为负" }]}
-          >
-            <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元/年" />
-          </Form.Item>
-          <Form.Item
             name="energyCostPerKm"
             label="每公里能源费用"
             rules={[{ type: "number", min: 0, message: "不能为负" }]}
@@ -460,6 +453,13 @@ const Home = () => {
               step={0.01}
               suffix="元/公里"
             />
+          </Form.Item>
+          <Form.Item
+            name="parkingFeePerYear"
+            label="年停车费（元/年）"
+            rules={[{ type: "number", min: 0, message: "不能为负" }]}
+          >
+            <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元/年" />
           </Form.Item>
 
           <div className="mb-4 mt-6">
