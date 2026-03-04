@@ -21,6 +21,10 @@ export interface CarCostInput {
   mileagePerYear: number;
   /** 年停车费（元/年），可为 0 */
   parkingFeePerYear?: number;
+  /** 年保养费（元/年），可为 0 */
+  maintenanceFeePerYear?: number;
+  /** 年事故违章费（元/年），可为 0 */
+  violationAccidentFeePerYear?: number;
   /** 每公里能源费用（元/公里），可为 0 */
   energyCostPerKm?: number;
   /** 总保险计算年数 */
@@ -32,6 +36,10 @@ export interface PeriodResult {
   totalInsurance: number;
    /** N 年总停车费 */
   totalParking: number;
+   /** N 年总保养费 */
+  totalMaintenance: number;
+   /** N 年总事故违章费 */
+  totalViolationAccident: number;
    /** N 年总能源费 */
   totalEnergy: number;
   totalCost: number;
@@ -132,6 +140,8 @@ export function calcCarCost(input: CarCostInput): CarCostResult {
     insuranceFirstYear,
     mileagePerYear,
     parkingFeePerYear,
+    maintenanceFeePerYear,
+    violationAccidentFeePerYear,
     energyCostPerKm,
   } = input;
 
@@ -144,6 +154,8 @@ export function calcCarCost(input: CarCostInput): CarCostResult {
   const ins8 = totalInsuranceNcd(insuranceFirstYear, 8);
 
   const annualParking = parkingFeePerYear ?? 0;
+  const annualMaintenance = maintenanceFeePerYear ?? 0;
+  const annualViolationAccident = violationAccidentFeePerYear ?? 0;
   const annualEnergyCost = multiply(
     mileagePerYear ?? 0,
     energyCostPerKm ?? 0
@@ -153,6 +165,14 @@ export function calcCarCost(input: CarCostInput): CarCostResult {
   const parking5 = multiply(annualParking, 5) as number;
   const parking8 = multiply(annualParking, 8) as number;
 
+  const maintenance3 = multiply(annualMaintenance, 3) as number;
+  const maintenance5 = multiply(annualMaintenance, 5) as number;
+  const maintenance8 = multiply(annualMaintenance, 8) as number;
+
+  const violationAccident3 = multiply(annualViolationAccident, 3) as number;
+  const violationAccident5 = multiply(annualViolationAccident, 5) as number;
+  const violationAccident8 = multiply(annualViolationAccident, 8) as number;
+
   const energy3 = multiply(annualEnergyCost, 3) as number;
   const energy5 = multiply(annualEnergyCost, 5) as number;
   const energy8 = multiply(annualEnergyCost, 8) as number;
@@ -161,15 +181,15 @@ export function calcCarCost(input: CarCostInput): CarCostResult {
   const oneTimePurchaseTax = purchaseTax ?? 0;
 
   const totalCost3 = add(
-    add(add(add(dep3, ins3), parking3), energy3),
+    add(add(add(add(add(dep3, ins3), parking3), maintenance3), violationAccident3), energy3),
     oneTimePurchaseTax
   ) as number;
   const totalCost5 = add(
-    add(add(add(dep5, ins5), parking5), energy5),
+    add(add(add(add(add(dep5, ins5), parking5), maintenance5), violationAccident5), energy5),
     oneTimePurchaseTax
   ) as number;
   const totalCost8 = add(
-    add(add(add(dep8, ins8), parking8), energy8),
+    add(add(add(add(add(dep8, ins8), parking8), maintenance8), violationAccident8), energy8),
     oneTimePurchaseTax
   ) as number;
 
@@ -189,6 +209,8 @@ export function calcCarCost(input: CarCostInput): CarCostResult {
       depreciation: dep3,
       totalInsurance: ins3,
       totalParking: parking3,
+      totalMaintenance: maintenance3,
+      totalViolationAccident: violationAccident3,
       totalEnergy: energy3,
       totalCost: totalCost3,
       totalMileage: mileage3,
@@ -198,6 +220,8 @@ export function calcCarCost(input: CarCostInput): CarCostResult {
       depreciation: dep5,
       totalInsurance: ins5,
       totalParking: parking5,
+      totalMaintenance: maintenance5,
+      totalViolationAccident: violationAccident5,
       totalEnergy: energy5,
       totalCost: totalCost5,
       totalMileage: mileage5,
@@ -207,6 +231,8 @@ export function calcCarCost(input: CarCostInput): CarCostResult {
       depreciation: dep8,
       totalInsurance: ins8,
       totalParking: parking8,
+      totalMaintenance: maintenance8,
+      totalViolationAccident: violationAccident8,
       totalEnergy: energy8,
       totalCost: totalCost8,
       totalMileage: mileage8,

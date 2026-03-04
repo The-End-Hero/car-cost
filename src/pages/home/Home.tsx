@@ -19,6 +19,8 @@ const DEFAULT_RATE_8 = 0.8;
 const DEFAULT_INSURANCE = 7500;
 const DEFAULT_MILEAGE = 12000;
 const DEFAULT_PARKING_FEE_PER_YEAR = 0;
+const DEFAULT_MAINTENANCE_FEE_PER_YEAR = 0;
+const DEFAULT_VIOLATION_ACCIDENT_FEE_PER_YEAR = 0;
 const DEFAULT_ENERGY_COST_PER_KM = 0.1;
 const DEFAULT_INITIAL_ONE_TIME_FEE = 10000;
 const DEFAULT_DOWN_PAYMENT = 90000;
@@ -50,6 +52,8 @@ interface FormValues {
   initialOneTimeFee: number;
   mileagePerYear: number;
   parkingFeePerYear: number;
+  maintenanceFeePerYear: number;
+  violationAccidentFeePerYear: number;
   energyCostPerKm: number;
   downPayment: number;
   loanMonths: number;
@@ -143,6 +147,8 @@ const Home = () => {
     const initialOneTimeFee = vals.initialOneTimeFee ?? DEFAULT_INITIAL_ONE_TIME_FEE;
     const mileage = vals.mileagePerYear ?? DEFAULT_MILEAGE;
      const parkingFeePerYear = vals.parkingFeePerYear ?? DEFAULT_PARKING_FEE_PER_YEAR;
+     const maintenanceFeePerYear = vals.maintenanceFeePerYear ?? DEFAULT_MAINTENANCE_FEE_PER_YEAR;
+     const violationAccidentFeePerYear = vals.violationAccidentFeePerYear ?? DEFAULT_VIOLATION_ACCIDENT_FEE_PER_YEAR;
      const energyCostPerKm = vals.energyCostPerKm ?? DEFAULT_ENERGY_COST_PER_KM;
     if (price <= 0 || ins <= 0 || mileage <= 0) return null;
     if (r3 < 0 || r3 > 1 || r5 < 0 || r5 > 1 || r8 < 0 || r8 > 1) return null;
@@ -154,6 +160,8 @@ const Home = () => {
       insuranceFirstYear: ins,
       mileagePerYear: mileage,
       parkingFeePerYear,
+      maintenanceFeePerYear,
+      violationAccidentFeePerYear,
       energyCostPerKm,
       purchaseTax: initialOneTimeFee,
     });
@@ -350,6 +358,8 @@ const Home = () => {
               initialOneTimeFee: DEFAULT_INITIAL_ONE_TIME_FEE,
               mileagePerYear: DEFAULT_MILEAGE,
               parkingFeePerYear: DEFAULT_PARKING_FEE_PER_YEAR,
+              maintenanceFeePerYear: DEFAULT_MAINTENANCE_FEE_PER_YEAR,
+              violationAccidentFeePerYear: DEFAULT_VIOLATION_ACCIDENT_FEE_PER_YEAR,
               energyCostPerKm: DEFAULT_ENERGY_COST_PER_KM,
               downPayment: DEFAULT_DOWN_PAYMENT,
               loanMonths: DEFAULT_LOAN_MONTHS,
@@ -457,6 +467,20 @@ const Home = () => {
           <Form.Item
             name="parkingFeePerYear"
             label="年停车费（元/年）"
+            rules={[{ type: "number", min: 0, message: "不能为负" }]}
+          >
+            <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元/年" />
+          </Form.Item>
+          <Form.Item
+            name="maintenanceFeePerYear"
+            label="年保养费（元/年）"
+            rules={[{ type: "number", min: 0, message: "不能为负" }]}
+          >
+            <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元/年" />
+          </Form.Item>
+          <Form.Item
+            name="violationAccidentFeePerYear"
+            label="年事故违章费（元/年）"
             rules={[{ type: "number", min: 0, message: "不能为负" }]}
           >
             <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元/年" />
@@ -572,6 +596,8 @@ const Home = () => {
                   ]}
                 />
                 <Statistic title="停车总额" value={formatMoney(result.period3.totalParking)} suffix="元" />
+                <Statistic title="保养总额" value={formatMoney(result.period3.totalMaintenance)} suffix="元" />
+                <Statistic title="事故违章总额" value={formatMoney(result.period3.totalViolationAccident)} suffix="元" />
                 <Statistic title="能源总额" value={formatMoney(result.period3.totalEnergy)} suffix="元" />
                 <Statistic title="综合成本" value={formatMoney(result.period3.totalCost)} suffix="元" />
                 <Statistic title="总里程" value={formatMoney(result.period3.totalMileage)} suffix="公里" />
@@ -602,6 +628,8 @@ const Home = () => {
                   ]}
                 />
                 <Statistic title="停车总额" value={formatMoney(result.period5.totalParking)} suffix="元" />
+                <Statistic title="保养总额" value={formatMoney(result.period5.totalMaintenance)} suffix="元" />
+                <Statistic title="事故违章总额" value={formatMoney(result.period5.totalViolationAccident)} suffix="元" />
                 <Statistic title="能源总额" value={formatMoney(result.period5.totalEnergy)} suffix="元" />
                 <Statistic title="综合成本" value={formatMoney(result.period5.totalCost)} suffix="元" />
                 <Statistic title="总里程" value={formatMoney(result.period5.totalMileage)} suffix="公里" />
@@ -632,6 +660,8 @@ const Home = () => {
                   ]}
                 />
                 <Statistic title="停车总额" value={formatMoney(result.period8.totalParking)} suffix="元" />
+                <Statistic title="保养总额" value={formatMoney(result.period8.totalMaintenance)} suffix="元" />
+                <Statistic title="事故违章总额" value={formatMoney(result.period8.totalViolationAccident)} suffix="元" />
                 <Statistic title="能源总额" value={formatMoney(result.period8.totalEnergy)} suffix="元" />
                 <Statistic title="综合成本" value={formatMoney(result.period8.totalCost)} suffix="元" />
                 <Statistic title="总里程" value={formatMoney(result.period8.totalMileage)} suffix="公里" />
