@@ -1,8 +1,8 @@
 /**
  * 汽车综合使用成本计算
- * 使用 math.js 进行数值运算（round 等），保证结果精度一致
+ * 使用 mathjs 进行数值运算（round 等），保证结果精度一致
  */
-import math from "math.js";
+import { round } from "mathjs";
 
 export interface CarCostInput {
   /** 车价（元） */
@@ -74,7 +74,7 @@ export function calculateAnnualPremium(
     config.minNCD,
     config.initialNCD - yearsWithoutClaim * config.discountStep
   );
-  return math.round(config.basePremium * currentNCD);
+  return round(config.basePremium * currentNCD);
 }
 
 /**
@@ -95,7 +95,7 @@ function totalInsuranceNcd(
   for (let t = 0; t < years; t++) {
     total += calculateAnnualPremium(t, fullConfig);
   }
-  return math.round(total);
+  return round(total);
 }
 
 /**
@@ -135,9 +135,9 @@ export function calcCarCost(input: CarCostInput): CarCostResult {
     energyCostPerKm,
   } = input;
 
-  const dep3 = math.round(price * depreciationRate3);
-  const dep5 = math.round(price * depreciationRate5);
-  const dep8 = math.round(price * depreciationRate8);
+  const dep3 = round(price * depreciationRate3);
+  const dep5 = round(price * depreciationRate5);
+  const dep8 = round(price * depreciationRate8);
 
   const ins3 = totalInsuranceNcd(insuranceFirstYear, 3);
   const ins5 = totalInsuranceNcd(insuranceFirstYear, 5);
@@ -166,9 +166,9 @@ export function calcCarCost(input: CarCostInput): CarCostResult {
   const mileage5 = mileagePerYear * 5;
   const mileage8 = mileagePerYear * 8;
 
-  const costPerKm3 = mileage3 > 0 ? math.round((totalCost3 / mileage3) * 100) / 100 : 0;
-  const costPerKm5 = mileage5 > 0 ? math.round((totalCost5 / mileage5) * 100) / 100 : 0;
-  const costPerKm8 = mileage8 > 0 ? math.round((totalCost8 / mileage8) * 100) / 100 : 0;
+  const costPerKm3 = mileage3 > 0 ? round(totalCost3 / mileage3, 2) : 0;
+  const costPerKm5 = mileage5 > 0 ? round(totalCost5 / mileage5, 2) : 0;
+  const costPerKm8 = mileage8 > 0 ? round(totalCost8 / mileage8, 2) : 0;
 
   return {
     period3: {
