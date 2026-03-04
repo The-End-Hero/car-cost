@@ -24,6 +24,11 @@ export interface CarFinancialAnalyzerInput {
   monthlyOpEx: number;
   /** 分析期末残值率 0~1，如 0.4 表示 40% */
   residualRate: number;
+  /**
+   * 分析期内每年末的总残值（车辆+选配），索引为年份 0..analysisYears。
+   * 若提供，则各年净财富缩水按当期卖出总残值计算；未提供时退回到使用期末总残值。
+   */
+  residualByYear?: number[];
   /** 理财年化收益率（机会成本基准），如 0.04 表示 4% */
   marketReturnRate: number;
 }
@@ -33,6 +38,8 @@ export interface CashFlowSeriesPoint {
   totalOutflow: number;
   opportunityCostWealth: number;
   netWealthLoss: number;
+  /** 该年末尚未还清的贷款本金（元），若无贷款则为 0 */
+  loanRemaining: number;
 }
 
 export interface CarFinancialSummary {
@@ -77,6 +84,32 @@ function monthlyPaymentAnnuity(
 }
 
 /**
+ * 构建等额本息还款下每个月还款后的剩余本金序列
+ * 数组下标为月份数：index=0 表示尚未还款时的本金；index=m 表示第 m 期还款后剩余本金
+ */
+function buildRemainingPrincipalSchedule(
+  loanAmount: number,
+  annualRate: number,
+  loanMonths: number,
+  monthlyPayment: number
+): number[] {
+  if (loanAmount <= 0 || loanMonths <= 0 || monthlyPayment <= 0) {
+    return [];
+  }
+  const r = divide(annualRate, 12) as number;
+  const schedule: number[] = [];
+  let remaining = loanAmount;
+  schedule[0] = loanAmount;
+  for (let m = 1; m <= loanMonths; m++) {
+    const interest = multiply(remaining, r) as number;
+    const principalPay = max(0, subtract(monthlyPayment, interest)) as number;
+    remaining = max(0, subtract(remaining, principalPay)) as number;
+    schedule[m] = remaining;
+  }
+  return schedule;
+}
+
+/**
  * 购车财务影响分析
  * @param input 分析参数
  * @param analysisYears 分析年数，如 5
@@ -107,6 +140,25 @@ export function calculateCarFinancial(
     loanAmount > 0 && loanMonths > 0
       ? monthlyPaymentAnnuity(loanAmount, annualLoanRate, loanMonths)
       : 0;
+  const remainingPrincipalSchedule =
+    loanAmount > 0 && loanMonths > 0 && monthlyPay > 0
+      ? buildRemainingPrincipalSchedule(
+          loanAmount,
+          annualLoanRate,
+          loanMonths,
+          monthlyPay
+        )
+      : [];
+
+  const getLoanRemainingAtMonth = (month: number): number => {
+    if (loanAmount <= 0 || loanMonths <= 0 || monthlyPay <= 0) {
+      return 0;
+    }
+    if (!remainingPrincipalSchedule.length) return 0;
+    if (month <= 0) return loanAmount;
+    if (month >= remainingPrincipalSchedule.length) return 0;
+    return remainingPrincipalSchedule[month] ?? 0;
+  };
 
   const initialOutflow = add(
     add(downPayment, taxAndInsurance),
@@ -125,14 +177,26 @@ export function calculateCarFinancial(
     finalOptionResidual
   ) as number;
 
+  const getResidualAtYear = (year: number): number => {
+    if (
+      Array.isArray(input.residualByYear) &&
+      year >= 0 &&
+      year < input.residualByYear.length
+    ) {
+      return input.residualByYear[year] as number;
+    }
+    return totalFinalResidual;
+  };
+
   const series: CashFlowSeriesPoint[] = [
     {
       year: 0,
       totalOutflow: totalNominalOutflow,
       opportunityCostWealth,
-      netWealthLoss: subtract(
-        opportunityCostWealth,
-        totalFinalResidual
+      loanRemaining: loanAmount,
+      netWealthLoss: add(
+        subtract(opportunityCostWealth, getResidualAtYear(0)),
+        loanAmount
       ) as number,
     },
   ];
@@ -151,21 +215,28 @@ export function calculateCarFinancial(
 
     if (m % 12 === 0) {
       const year = divide(m, 12) as number;
+      const loanRemainingAtYear = getLoanRemainingAtMonth(
+        Math.min(m, loanMonths)
+      );
       series.push({
         year,
         totalOutflow: totalNominalOutflow,
         opportunityCostWealth,
-        netWealthLoss: subtract(
-          opportunityCostWealth,
-          totalFinalResidual
+        loanRemaining: loanRemainingAtYear,
+        netWealthLoss: add(
+          subtract(opportunityCostWealth, getResidualAtYear(year)),
+          loanRemainingAtYear
         ) as number,
       });
     }
   }
 
-  const netWealthLoss = subtract(
-    opportunityCostWealth,
-    totalFinalResidual
+  const finalResidualForNet = getResidualAtYear(analysisYears);
+  const monthsAtEnd = Math.min(months, loanMonths);
+  const loanRemainingAtEnd = getLoanRemainingAtMonth(monthsAtEnd);
+  const netWealthLoss = add(
+    subtract(opportunityCostWealth, finalResidualForNet),
+    loanRemainingAtEnd
   ) as number;
   const lostInvestmentGain = subtract(
     opportunityCostWealth,

@@ -46,6 +46,67 @@ function formatMoney(n: number) {
   }).format(n);
 }
 
+/**
+ * 根据 3/5/8 年折旧率做分段线性插值，得到指定年份末的车辆残值率（0~1）
+ * 已知点：(0, 0.95) 即购车后马上当二手卖约 95%，(3, 1-r3), (5, 1-r5), (8, 1-r8)；year > 8 时返回 8 年残值率
+ */
+function interpolateResidualRate(
+  year: number,
+  depreciationRate3: number,
+  depreciationRate5: number,
+  depreciationRate8: number
+): number {
+  const r0 = 0.95;
+  const r3 = max(0, subtract(1, depreciationRate3) as number) as number;
+  const r5 = max(0, subtract(1, depreciationRate5) as number) as number;
+  const r8 = max(0, subtract(1, depreciationRate8) as number) as number;
+  if (year <= 0) return r0;
+  if (year >= 8) return r8;
+  if (year <= 3) {
+    return add(r0, multiply(divide(subtract(r3, r0), 3), year)) as number;
+  }
+  if (year <= 5) {
+    return add(r3, multiply(divide(subtract(r5, r3), 2), subtract(year, 3) as number)) as number;
+  }
+  return add(r5, multiply(divide(subtract(r8, r5), 3), subtract(year, 5) as number)) as number;
+}
+
+function buildResidualByYearArray(
+  price: number,
+  depreciationRate3: number,
+  depreciationRate5: number,
+  depreciationRate8: number,
+  analysisYears: number,
+  optionCost: number,
+  optionResidualRate: number
+): number[] {
+  const rateAtEnd = interpolateResidualRate(
+    analysisYears,
+    depreciationRate3,
+    depreciationRate5,
+    depreciationRate8
+  );
+  const arr: number[] = [];
+  for (let year = 0; year <= analysisYears; year++) {
+    const rate = interpolateResidualRate(
+      year,
+      depreciationRate3,
+      depreciationRate5,
+      depreciationRate8
+    );
+    const vehicleResidual = multiply(price, rate) as number;
+    const optionResidual =
+      optionCost > 0 && rateAtEnd > 0
+        ? (multiply(
+            multiply(optionCost, divide(rate, rateAtEnd)),
+            optionResidualRate
+          ) as number)
+        : 0;
+    arr.push(add(vehicleResidual, optionResidual) as number);
+  }
+  return arr;
+}
+
 interface FormValues {
   price: number;
   depreciationRate3: number;
@@ -190,13 +251,16 @@ const Home = () => {
     const vals = formValues as Partial<FormValues> | undefined;
     if (!vals || typeof vals !== "object") return null;
     const price = vals.price ?? DEFAULT_PRICE;
+    const r3 = vals.depreciationRate3 ?? DEFAULT_RATE_3;
     const downPayment = vals.downPayment ?? DEFAULT_DOWN_PAYMENT;
     const initialOneTimeFee = vals.initialOneTimeFee ?? DEFAULT_INITIAL_ONE_TIME_FEE;
     const loanMonths = vals.loanMonths ?? DEFAULT_LOAN_MONTHS;
     const annualLoanRate = vals.annualLoanRate ?? DEFAULT_ANNUAL_LOAN_RATE;
     const marketReturnRate = vals.marketReturnRate ?? DEFAULT_MARKET_RETURN_RATE;
     const analysisYears = vals.analysisYears ?? DEFAULT_ANALYSIS_YEARS;
+    const depreciationRate3 = r3;
     const depreciationRate5 = vals.depreciationRate5 ?? DEFAULT_RATE_5;
+    const depreciationRate8 = vals.depreciationRate8 ?? DEFAULT_RATE_8;
     const residualRate = min(
       1,
       max(0, subtract(1, depreciationRate5) as number)
@@ -214,6 +278,15 @@ const Home = () => {
       (optionCost > 0 && (optionResidualRate < 0 || optionResidualRate > 1))
     )
       return null;
+    const residualByYear = buildResidualByYearArray(
+      price,
+      depreciationRate3,
+      depreciationRate5,
+      depreciationRate8,
+      analysisYears,
+      optionCost,
+      optionResidualRate
+    );
     return calculateCarFinancial(
       {
         price,
@@ -226,6 +299,7 @@ const Home = () => {
         marketReturnRate,
         optionCost: optionCost > 0 ? optionCost : undefined,
         optionResidualRate: optionCost > 0 ? optionResidualRate : undefined,
+        residualByYear,
       },
       analysisYears
     );
@@ -258,6 +332,15 @@ const Home = () => {
 
   useEffect(() => {
     if (!lineChartRef.current || !cashFlowResult) return;
+    const vals = formValues as Partial<FormValues> | undefined;
+    const price = vals?.price ?? DEFAULT_PRICE;
+    const depreciationRate3 = vals?.depreciationRate3 ?? DEFAULT_RATE_3;
+    const depreciationRate5 = vals?.depreciationRate5 ?? DEFAULT_RATE_5;
+    const depreciationRate8 = vals?.depreciationRate8 ?? DEFAULT_RATE_8;
+    const analysisYears = vals?.analysisYears ?? DEFAULT_ANALYSIS_YEARS;
+    const optionCost = vals?.optionCost ?? DEFAULT_OPTION_COST;
+    const optionResidualRate = vals?.optionResidualRate ?? DEFAULT_OPTION_RESIDUAL_RATE;
+
     const chart = echarts.init(lineChartRef.current, isDark ? "dark" : undefined);
     const { series: s, summary } = cashFlowResult;
     const years = s.map((p) => p.year);
@@ -268,6 +351,20 @@ const Home = () => {
       summary.optionResidual
     ) as number;
     const residualLine = s.map(() => totalResidual);
+    const residualByYear = buildResidualByYearArray(
+      price,
+      depreciationRate3,
+      depreciationRate5,
+      depreciationRate8,
+      analysisYears,
+      optionCost,
+      optionResidualRate
+    );
+    const currentPeriodResidualLine = years.map((year) =>
+      year >= 0 && year < residualByYear.length
+        ? residualByYear[year]
+        : residualByYear[residualByYear.length - 1] ?? 0
+    );
     const netWealthLoss = s.map((p) => p.netWealthLoss);
     chart.setOption({
       tooltip: {
@@ -275,7 +372,16 @@ const Home = () => {
         valueFormatter: (value: number) =>
         `${round(divide(value, 10000), 2)} 万元`,
       },
-      legend: { data: ["累计名义支出", "机会成本财富", "总残值（车辆+选配）", "净财富缩水"], bottom: 0 },
+      legend: {
+        data: [
+          "累计名义支出",
+          "机会成本财富",
+          "总残值（车辆+选配）",
+          "当期卖出总残值（车辆+选配）",
+          "净财富缩水",
+        ],
+        bottom: 0,
+      },
       grid: { left: "3%", right: "4%", bottom: "15%", top: "10%", containLabel: true },
       xAxis: { type: "category", data: years, name: "年" },
       yAxis: {
@@ -290,13 +396,19 @@ const Home = () => {
         { name: "累计名义支出", type: "line", data: totalOutflow, smooth: true },
         { name: "机会成本财富", type: "line", data: opportunityCostWealth, smooth: true },
         { name: "总残值（车辆+选配）", type: "line", data: residualLine, lineStyle: { type: "dashed" } },
+        {
+          name: "当期卖出总残值（车辆+选配）",
+          type: "line",
+          data: currentPeriodResidualLine,
+          smooth: true,
+        },
         { name: "净财富缩水", type: "line", data: netWealthLoss, smooth: true },
       ],
     });
     return () => {
       chart.dispose();
     };
-  }, [cashFlowResult, isDark]);
+  }, [cashFlowResult, formValues, isDark]);
 
   useEffect(() => {
     if (!barChartRef.current || !cashFlowResult) return;
@@ -707,16 +819,21 @@ const Home = () => {
                     value={formatMoney(cashFlowResult.summary.optionResidual)}
                     suffix="元"
                   />
-                  <Statistic
-                    title="总残值（车辆+选配）"
-                    value={formatMoney(
-                      add(
-                        cashFlowResult.summary.vehicleResidual,
-                        cashFlowResult.summary.optionResidual
-                      ) as number
-                    )}
-                    suffix="元"
-                  />
+                  <div>
+                    <Statistic
+                      title="总残值（车辆+选配）"
+                      value={formatMoney(
+                        add(
+                          cashFlowResult.summary.vehicleResidual,
+                          cashFlowResult.summary.optionResidual
+                        ) as number
+                      )}
+                      suffix="元"
+                    />
+                    <Typography.Text type="secondary" className="text-xs">
+                      分析期末卖车可收回的金额
+                    </Typography.Text>
+                  </div>
                   <Statistic
                     title="错失的利息（机会成本）"
                     value={formatMoney(cashFlowResult.summary.lostInvestmentGain)}
@@ -743,6 +860,24 @@ const Home = () => {
               </div>
               <div>
                 <Typography.Title level={5}>现金流与财富随时间变化</Typography.Title>
+                <div className="mb-2 text-sm space-y-1">
+                  <Typography.Text type="secondary" className="block">
+                    <Typography.Text strong>「总残值（车辆+选配）」</Typography.Text>
+                    ：表示在分析期<span className="underline decoration-dotted">最后一年</span>卖车可收回的金额，因此对应图中的一条水平线。
+                  </Typography.Text>
+                  <Typography.Text type="secondary" className="block">
+                    <Typography.Text strong>「当期卖出总残值（车辆+选配）」</Typography.Text>
+                    ：表示在<span className="underline decoration-dotted">每个年份末</span>立刻卖车可收回的金额，随年份增加而递减（车辆持续折旧）。
+                  </Typography.Text>
+                  <Typography.Text type="secondary" className="block">
+                    <Typography.Text strong>「净财富缩水」</Typography.Text>
+                    ：用一个更严谨的方式衡量“买车占用资金”的代价。
+                    <br />
+                    ≈「假设不买车而是把同样的钱全部拿去理财，在该年末本应拥有的财富」
+                    <br />
+                    减去「在该年末卖车后实际能留下的净资产（当期卖出总残值 − 剩余贷款本金）」。
+                  </Typography.Text>
+                </div>
                 <div ref={lineChartRef} style={{ height: 320 }} />
               </div>
               <div>
