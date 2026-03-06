@@ -679,6 +679,12 @@ const Home = () => {
             <Form.Item
               name="marketReturnRate"
               label="理财年化收益率（机会成本）"
+              extra={
+                <div className="text-gray-500 dark:text-gray-400 text-sm space-y-0.5">
+                  <div>参考：定投纳斯达克100 近10年年化约 12%</div>
+                  <div>参考：定投红利低波 ETF 近10年年化约 8%</div>
+                </div>
+              }
               rules={[{ required: true }, { type: "number", min: 0 }]}
             >
               <InputNumber
