@@ -3,7 +3,7 @@
  * 将汽车视为贬值资产，对比与投资增值资产的机会成本差额
  * 使用 mathjs 进行数值运算，保证结果精度一致
  */
-import { add, divide, max, multiply, pow, subtract } from "mathjs";
+import { add, divide, max, min, multiply, pow, subtract } from "mathjs";
 
 export interface CarFinancialAnalyzerInput {
   /** 车价（元） */
@@ -216,7 +216,7 @@ export function calculateCarFinancial(
     if (m % 12 === 0) {
       const year = divide(m, 12) as number;
       const loanRemainingAtYear = getLoanRemainingAtMonth(
-        Math.min(m, loanMonths)
+        min(m, loanMonths) as number
       );
       series.push({
         year,
@@ -232,7 +232,7 @@ export function calculateCarFinancial(
   }
 
   const finalResidualForNet = getResidualAtYear(analysisYears);
-  const monthsAtEnd = Math.min(months, loanMonths);
+  const monthsAtEnd = min(months, loanMonths) as number;
   const loanRemainingAtEnd = getLoanRemainingAtMonth(monthsAtEnd);
   const netWealthLoss = add(
     subtract(opportunityCostWealth, finalResidualForNet),

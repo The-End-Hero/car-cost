@@ -153,7 +153,7 @@ export function calcMonthlyOpExFromAnnual(params: MonthlyOpExFromAnnualParams): 
     mileagePerYear,
     energyCostPerKm = 0,
   } = params;
-  const annualInsurance = totalInsuranceNcd(insuranceFirstYear, 3) / 3;
+  const annualInsurance = divide(totalInsuranceNcd(insuranceFirstYear, 3), 3) as number;
   const annualEnergy = multiply(mileagePerYear, energyCostPerKm) as number;
   const annualTotal = add(
     add(
