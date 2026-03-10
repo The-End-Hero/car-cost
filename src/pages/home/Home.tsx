@@ -568,7 +568,7 @@ const Home = () => {
             name="initialOneTimeFee"
             label="购置税、上牌、等一次性支出（元）"
             rules={[{ type: "number", min: 0, message: "不能为负" }]}
-            extra="一次性费用，同时用于上方综合成本与下方现金流/机会成本分析，无需重复填写。"
+            extra="购置税、上牌等一次性费用（不含首年保险）。该项会同时用于上方综合成本与下方现金流/机会成本分析，无需在其他地方重复填写。"
           >
             <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={0} suffix="元" />
           </Form.Item>
@@ -617,7 +617,7 @@ const Home = () => {
           <div className="mb-4 mt-6">
             <Typography.Title level={5}>现金流与机会成本参数（贷款、复利、残值）</Typography.Title>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-              残值率已由上方「5 年折旧率」自动推导（约等于 1 - 5 年折旧率），无需单独填写。
+              残值率由上方「5 年折旧率」自动推导（约等于 1 - 5 年折旧率），即使分析年数不是 5 年，也统一按这一期末残值率估算，无需单独填写。
             </p>
             <Form.Item
               name="downPayment"
@@ -683,6 +683,7 @@ const Home = () => {
                 <div className="text-gray-500 dark:text-gray-400 text-sm space-y-0.5">
                   <div>参考：定投纳斯达克100 近10年年化约 12%</div>
                   <div>参考：定投红利低波 ETF 近10年年化约 8%</div>
+                  <div>以上为历史收益率，仅供参考，不代表未来表现，建议按保守预期填写。</div>
                 </div>
               }
               rules={[{ required: true }, { type: "number", min: 0 }]}
@@ -698,6 +699,7 @@ const Home = () => {
               name="analysisYears"
               label="分析年数"
               rules={[{ required: true }, { type: "number", min: 1 }]}
+              extra="当分析年数大于 8 年时，车辆残值按 8 年残值率保持不再继续下降，仅作为内部估算假设。"
             >
               <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={1} suffix="年" />
             </Form.Item>
@@ -882,6 +884,8 @@ const Home = () => {
                     ≈「假设不买车而是把同样的钱全部拿去理财，在该年末本应拥有的财富」
                     <br />
                     减去「在该年末卖车后实际能留下的净资产（当期卖出总残值 − 剩余贷款本金）」。
+                    <br />
+                    为便于比较，这是一个理想化模型，假设每一笔购车相关支出都能在当期立刻按该理财收益率投入并持续复利。
                   </Typography.Text>
                 </div>
                 <div ref={lineChartRef} style={{ height: 320 }} />
