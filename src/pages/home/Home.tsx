@@ -318,6 +318,7 @@ const Home = () => {
     try {
       const result = await snapdom(reportRef.current, {
         backgroundColor: isDark ? "#000000" : "#ffffff",
+        width: 672, // 与 max-w-2xl 一致，避免截图时宽度收缩导致 suffix 换行
       });
       await result.download({
         filename: "car-cost-report.png",

@@ -15,3 +15,8 @@ html.dark body {
   background-color: #141414;
   color: rgba(255, 255, 255, 0.85);
 }
+
+/* 防止 snapdom 截图时 InputNumber 右侧 suffix 换行 */
+.ant-input-number .ant-input-number-suffix {
+  white-space: nowrap;
+}
