@@ -14,7 +14,7 @@ import {
   calculateCarFinancial,
   type CarFinancialResult,
 } from "@/utils/carFinancialAnalyzer";
-import { domToPng } from "modern-screenshot";
+import { snapdom } from "@zumer/snapdom";
 import { add, divide, min, max, multiply, round, subtract } from "mathjs";
 
 const DEFAULT_PRICE = 253900;
@@ -316,13 +316,12 @@ const Home = () => {
     const btn = saveReportBtnRef.current;
     if (btn) btn.style.visibility = "hidden";
     try {
-      const dataUrl = await domToPng(reportRef.current, {
+      const result = await snapdom(reportRef.current, {
         backgroundColor: isDark ? "#000000" : "#ffffff",
       });
-      const link = document.createElement("a");
-      link.download = "car-cost-report.png";
-      link.href = dataUrl;
-      link.click();
+      await result.download({
+        filename: "car-cost-report.png",
+      });
     } catch {
       // 忽略截图错误，避免打断用户操作
     } finally {
