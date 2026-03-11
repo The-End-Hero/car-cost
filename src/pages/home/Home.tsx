@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { Button, Card, Collapse, Form, InputNumber, Statistic, Typography } from "antd";
 import { useWatch } from "antd/es/form/Form";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as echarts from "echarts";
 import { useThemeStore } from "@/stores/theme";
 import {
@@ -306,15 +306,15 @@ const Home = () => {
   }, [formValues, computedMonthlyOpEx]);
 
   const reportRef = useRef<HTMLDivElement>(null);
-  const saveReportBtnRef = useRef<HTMLButtonElement>(null);
+  const [isSavingReport, setIsSavingReport] = useState(false);
   const lineChartRef = useRef<HTMLDivElement>(null);
   const barChartRef = useRef<HTMLDivElement>(null);
   const isDark = useThemeStore((s) => s.isDark());
 
   const handleSaveReport = async () => {
     if (!reportRef.current) return;
-    const btn = saveReportBtnRef.current;
-    if (btn) btn.style.visibility = "hidden";
+    setIsSavingReport(true);
+    await new Promise((r) => setTimeout(r, 200));
     try {
       const result = await snapdom(reportRef.current, {
         backgroundColor: isDark ? "#000000" : "#ffffff",
@@ -325,7 +325,7 @@ const Home = () => {
     } catch {
       // 忽略截图错误，避免打断用户操作
     } finally {
-      if (btn) btn.style.visibility = "";
+      setIsSavingReport(false);
     }
   };
 
@@ -469,9 +469,11 @@ const Home = () => {
             <Typography.Title level={2} className="!mb-0">
               汽车综合使用成本计算器
             </Typography.Title>
-            <Button ref={saveReportBtnRef} type="primary" onClick={handleSaveReport}>
-              保存报告为图片
-            </Button>
+            {!isSavingReport && (
+              <Button type="primary" onClick={handleSaveReport}>
+                保存报告为图片
+              </Button>
+            )}
           </div>
 
           <Form
