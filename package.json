@@ -13,7 +13,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",
     "@xiping/react-components": "^1.0.69",
-    "@zumer/snapdom": "^2.1.0",
+    "@zumer/snapdom": "^2.5.0",
     "ahooks": "^3.9.6",
     "antd": "^6.3.3",
     "axios": "^1.13.6",
