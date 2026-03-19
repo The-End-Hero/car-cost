@@ -11,6 +11,9 @@ body {
   background-color: #ffffff;
   color: rgba(0, 0, 0, 0.88);
 }
+#root {
+  min-height: 100vh;
+}
 html.dark body {
   background-color: #141414;
   color: rgba(255, 255, 255, 0.85);
