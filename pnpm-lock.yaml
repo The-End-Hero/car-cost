@@ -12,8 +12,8 @@ importers:
         specifier: ^4.2.2
         version: 4.2.2(vite@8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@2.6.1)(less@4.6.4)(terser@5.46.1))
       '@xiping/react-components':
-        specifier: ^1.0.69
-        version: 1.0.69(@tiptap/core@3.20.4(@tiptap/pm@3.20.4))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(core-js@3.48.0)(framer-motion@12.38.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tailwindcss@4.2.2)(use-sync-external-store@1.6.0(react@19.2.4))
+        specifier: ^1.0.70
+        version: 1.0.70(@tiptap/core@3.20.4(@tiptap/pm@3.20.4))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(core-js@3.48.0)(framer-motion@12.38.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tailwindcss@4.2.2)(use-sync-external-store@1.6.0(react@19.2.4))
       '@zumer/snapdom':
         specifier: ^2.5.0
         version: 2.5.0
@@ -97,8 +97,8 @@ importers:
         specifier: ^6.0.1
         version: 6.0.1(vite@8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@2.6.1)(less@4.6.4)(terser@5.46.1))
       '@xiping/vite-version':
-        specifier: ^1.0.67
-        version: 1.0.67(vite@8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@2.6.1)(less@4.6.4)(terser@5.46.1))
+        specifier: ^1.0.70
+        version: 1.0.70(vite@8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@2.6.1)(less@4.6.4)(terser@5.46.1))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -3146,8 +3146,8 @@ packages:
   '@xiping/llm-utils@1.0.10':
     resolution: {integrity: sha512-5RXkLUhiM/iTivHwqADoWsQ4Z7fS/EPnGbn7rClBqH7yifYGJVdo4TLk/dyy8wbCu8RUKC9E6kCr5H2gZr7jYg==}
 
-  '@xiping/react-components@1.0.69':
-    resolution: {integrity: sha512-f+BaFXIGu4yN651k57yIvfp2KNLuWBB+Xr1rlssyDSyU8nHYerRTB5whvJw8KvVt56+kE2qOiSpmZw4QJJBPuA==}
+  '@xiping/react-components@1.0.70':
+    resolution: {integrity: sha512-6R+ObPKxB1WaNteCMXGvVklWJFSQeI56B2dSQQ1r6fVf3fo+fjb7N4IyxMNX4wQoYSsGGbP+FIoB69c6MjzEUw==}
     engines: {node: '>=22'}
     peerDependencies:
       react: '>=18 || >= 19'
@@ -3156,8 +3156,8 @@ packages:
   '@xiping/subtitle@1.0.52':
     resolution: {integrity: sha512-6IJdTBDRzHK1+T1Qt9vmIDEiutf9kX2bSKVw95GMBSb4RLFtNGkNgKARjI0RTl+/DgFmv2MG3deXlafk19jEmw==}
 
-  '@xiping/vite-version@1.0.67':
-    resolution: {integrity: sha512-5n5sRJkKQ4zRWyd58sM3zGC5pB24i+EUaMZBKGdt74OcytjH5td+o47ebl2litMT3T/VEWg50BujcTU+a4VsIw==}
+  '@xiping/vite-version@1.0.70':
+    resolution: {integrity: sha512-ykItW5dL8CH4w8bazuwUHGVKW8W86tK8ZeBUiqRFcWFnBr+mIhbI4b9XlgRmJTJ0MtDMrhsohEXvWZjV3oZWOQ==}
     peerDependencies:
       vite: '>=3.0.0'
 
@@ -3272,8 +3272,8 @@ packages:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
 
-  baseline-browser-mapping@2.10.8:
-    resolution: {integrity: sha512-PCLz/LXGBsNTErbtB6i5u4eLpHeMfi93aUv5duMmj6caNu6IphS4q6UevDnL36sZQv9lrP11dbPKGMaXPwMKfQ==}
+  baseline-browser-mapping@2.10.9:
+    resolution: {integrity: sha512-OZd0e2mU11ClX8+IdXe3r0dbqMEznRiT4TfbhYIbcRPZkqJ7Qwer8ij3GZAmLsRKa+II9V1v5czCkvmHH3XZBg==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -4871,8 +4871,8 @@ packages:
       '@types/react': '>=18'
       react: '>=18'
 
-  react-resizable-panels@4.7.3:
-    resolution: {integrity: sha512-PYcYMLtvJD+Pr0TQNeMvddcnLOwUa/Yb4iNwU7ThNLlHaQYEEC9MIBWHaBGODzYuXIkPRZ/OWe5sbzG1Rzq5ew==}
+  react-resizable-panels@4.7.4:
+    resolution: {integrity: sha512-1sehMbUJxZFj4imu1TuH+RS7Xe5Jo+3HyxBYafCEdxPmDeLAQNmKEByyxCQRl7xCLa5cLXSJ9T8acQyyiPsNdQ==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
@@ -9509,7 +9509,7 @@ snapshots:
     dependencies:
       '@microsoft/fetch-event-source': 2.0.1
 
-  '@xiping/react-components@1.0.69(@tiptap/core@3.20.4(@tiptap/pm@3.20.4))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(core-js@3.48.0)(framer-motion@12.38.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tailwindcss@4.2.2)(use-sync-external-store@1.6.0(react@19.2.4))':
+  '@xiping/react-components@1.0.70(@tiptap/core@3.20.4(@tiptap/pm@3.20.4))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(core-js@3.48.0)(framer-motion@12.38.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tailwindcss@4.2.2)(use-sync-external-store@1.6.0(react@19.2.4))':
     dependencies:
       '@floating-ui/dom': 1.7.6
       '@heroui/react': 2.8.10(@types/react@19.2.14)(framer-motion@12.38.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tailwindcss@4.2.2)
@@ -9539,7 +9539,7 @@ snapshots:
       react-hot-toast: 2.6.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react-icons: 5.5.0(react@19.2.4)
       react-markdown: 10.1.0(@types/react@19.2.14)(react@19.2.4)
-      react-resizable-panels: 4.7.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react-resizable-panels: 4.7.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react-router-dom: 7.13.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       xgplayer: 3.0.24(core-js@3.48.0)
       zustand: 5.0.12(@types/react@19.2.14)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))
@@ -9561,7 +9561,7 @@ snapshots:
       compromise: 14.15.0
       jieba-wasm: 2.4.0
 
-  '@xiping/vite-version@1.0.67(vite@8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@2.6.1)(less@4.6.4)(terser@5.46.1))':
+  '@xiping/vite-version@1.0.70(vite@8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@2.6.1)(less@4.6.4)(terser@5.46.1))':
     dependencies:
       vite: 8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@2.6.1)(less@4.6.4)(terser@5.46.1)
 
@@ -9745,7 +9745,7 @@ snapshots:
 
   balanced-match@4.0.4: {}
 
-  baseline-browser-mapping@2.10.8: {}
+  baseline-browser-mapping@2.10.9: {}
 
   boolbase@1.0.0: {}
 
@@ -9766,7 +9766,7 @@ snapshots:
 
   browserslist@4.28.1:
     dependencies:
-      baseline-browser-mapping: 2.10.8
+      baseline-browser-mapping: 2.10.9
       caniuse-lite: 1.0.30001780
       electron-to-chromium: 1.5.321
       node-releases: 2.0.36
@@ -11556,7 +11556,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  react-resizable-panels@4.7.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  react-resizable-panels@4.7.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
