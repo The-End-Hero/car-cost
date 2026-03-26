@@ -49,6 +49,10 @@ export interface CarFinancialSummary {
   optionResidual: number;
   lostInvestmentGain: number;
   netWealthImpact: number;
+  /** 分析期末剩余未还贷款本金（元），若无贷款则为 0 */
+  loanRemainingAtEnd: number;
+  /** 分析期末车辆与选配合计残值（元），用于与 netWealthImpact 交叉验证 */
+  totalResidualAtEnd: number;
 }
 
 export interface CarFinancialEfficiency {
@@ -251,6 +255,8 @@ export function calculateCarFinancial(
       optionResidual: finalOptionResidual,
       lostInvestmentGain,
       netWealthImpact: netWealthLoss,
+      loanRemainingAtEnd,
+      totalResidualAtEnd: finalResidualForNet,
     },
     efficiency: {
       annualCost: costPerYear,

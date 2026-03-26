@@ -854,6 +854,21 @@ const Home = () => {
                     value={formatMoney(cashFlowResult.summary.netWealthImpact)}
                     suffix="元"
                   />
+                  {cashFlowResult.summary.loanRemainingAtEnd > 0 && (
+                    <Typography.Text type="secondary" className="text-xs">
+                      其中未还贷款 ¥{formatMoney(cashFlowResult.summary.loanRemainingAtEnd)}
+                    </Typography.Text>
+                  )}
+                  <Statistic
+                    title="期末卖车可得"
+                    value={formatMoney(cashFlowResult.summary.totalResidualAtEnd)}
+                    suffix="元"
+                  />
+                  <Typography.Text type="secondary" className="text-xs">
+                    车辆 ¥{formatMoney(cashFlowResult.summary.vehicleResidual)}
+                    {cashFlowResult.summary.optionResidual > 0 &&
+                      ` + 选配 ¥${formatMoney(cashFlowResult.summary.optionResidual)}`}
+                  </Typography.Text>
                 </Card>
                 <Card size="small">
                   <Statistic
