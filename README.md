@@ -1,50 +1,75 @@
-# React + TypeScript + Vite
+# Car Cost Calculator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A comprehensive web application for calculating the true total cost of car ownership.
 
-Currently, two official plugins are available:
+[![中文](https://img.shields.io/badge/-中文-red?style=flat-square)](README_zh.md)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### Cost Analysis
+- **Comprehensive ownership costs** over 3, 5, and 8 year periods
+- **Depreciation tracking** with EV and ICE vehicle reference data
+- **Insurance calculation** with No-Claim Discount (NCD) progression
+- **Energy cost tracking** for electricity/fuel
+- **Cost per kilometer** breakdown
 
-- Configure the top-level `parserOptions` property like this:
+### Financial Analysis
+- **Cash flow analysis** with detailed outflow tracking
+- **Opportunity cost modeling** - compare purchase vs investment returns
+- **Loan amortization** with equal installment calculations
+- **Remaining loan balance** at end of analysis period
+- **Net wealth impact** calculation
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### Visualization
+- **Wealth trajectory chart** - line chart showing financial position over time
+- **Expense breakdown** - pie chart showing cost distribution
+- **Report export** - save analysis as PNG image
+
+---
+
+## Tech Stack
+
+| Category | Technology |
+|----------------|-------------------|
+| Framework | React 19, TypeScript, Vite |
+| UI | Ant Design 6, Tailwind CSS 4, ECharts 6 |
+| State | Zustand |
+| Math | mathjs |
+| Routing | React Router 7 |
+
+---
+
+## Getting Started
+
+```bash
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm dev
+
+# Build for production
+pnpm build
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+---
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+## Project Structure
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```
+src/
+├── main.tsx              # Entry point
+├── App.tsx               # Router setup
+├── pages/home/
+│   └── Home.tsx          # Main calculator UI
+├── components/
+│   ├── ThemeSwitch.tsx   # Dark/light mode toggle
+│   └── Footer.tsx        # Footer
+├── utils/
+│   ├── carCost.ts        # Ownership cost calculator
+│   └── carFinancialAnalyzer.ts  # Opportunity cost analyzer
+└── providers/
+    └── ThemeProvider.tsx # Theme configuration
 ```
