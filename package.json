@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint ",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "preview": "vite preview",
     "preinstall": "npx only-allow pnpm"
   },
@@ -62,7 +64,8 @@
     "vite": "^8.0.10",
     "vite-plugin-image-optimizer": "^2.0.3",
     "vite-plugin-pwa": "^1.2.0",
-    "vite-plugin-zip-pack": "^1.2.4"
+    "vite-plugin-zip-pack": "^1.2.4",
+    "vitest": "^4.1.5"
   },
   "engines": {
     "node": ">=22"
