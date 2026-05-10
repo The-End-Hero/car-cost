@@ -47,8 +47,26 @@ function formatMoney(n: number) {
 }
 
 /**
+ * 最低残值率（约等于报废价格）
+ * 基于中国市场：
+ * - 燃油车整备质量约 1.2-1.5 吨，废钢价格约 2000-3000 元/吨，报废价约 2400-4500 元
+ * - 新能源车整备质量约 1.8-2.2 吨（电池重），加上电池回收价值，报废价约 4000-8000 元
+ * - 20 万左右的新能源车，报废价约 5000-8000 元，残值率约 2.5-4%
+ * 取 3% 作为最低残值率，适用于大多数乘用车
+ */
+const MIN_RESIDUAL_RATE = 0.03;
+
+/**
+ * 8 年后每年残值衰减率
+ * 根据中国汽车流通协会数据，8 年以上车辆每年残值率下降约 1-2%
+ * 取 1.5% 作为中间值
+ */
+const POST_8_DECAY_RATE = 0.015;
+
+/**
  * 根据 3/5/8 年折旧率做分段线性插值，得到指定年份末的车辆残值率（0~1）
- * 已知点：(0, 0.95) 即购车后马上当二手卖约 95%，(3, 1-r3), (5, 1-r5), (8, 1-r8)；year > 8 时返回 8 年残值率
+ * 已知点：(0, 0.95) 即购车后马上当二手卖约 95%，(3, 1-r3), (5, 1-r5), (8, 1-r8)
+ * year > 8 时继续衰减，最低不低于 MIN_RESIDUAL_RATE（约报废价格）
  */
 function interpolateResidualRate(
   year: number,
@@ -61,14 +79,19 @@ function interpolateResidualRate(
   const r5 = max(0, subtract(1, depreciationRate5) as number) as number;
   const r8 = max(0, subtract(1, depreciationRate8) as number) as number;
   if (year <= 0) return r0;
-  if (year >= 8) return r8;
   if (year <= 3) {
     return add(r0, multiply(divide(subtract(r3, r0), 3), year)) as number;
   }
   if (year <= 5) {
     return add(r3, multiply(divide(subtract(r5, r3), 2), subtract(year, 3) as number)) as number;
   }
-  return add(r5, multiply(divide(subtract(r8, r5), 3), subtract(year, 5) as number)) as number;
+  if (year <= 8) {
+    return add(r5, multiply(divide(subtract(r8, r5), 3), subtract(year, 5) as number)) as number;
+  }
+  // 8 年后继续衰减，最低不低于报废价格
+  const yearsAfter8 = subtract(year, 8) as number;
+  const decayedRate = subtract(r8, multiply(yearsAfter8, POST_8_DECAY_RATE)) as number;
+  return max(MIN_RESIDUAL_RATE, decayedRate) as number;
 }
 
 function buildResidualByYearArray(
@@ -701,7 +724,7 @@ const Home = () => {
               name="analysisYears"
               label="分析年数"
               rules={[{ required: true }, { type: "number", min: 1 }]}
-              extra="当分析年数大于 8 年时，车辆残值按 8 年残值率保持不再继续下降，仅作为内部估算假设。"
+              extra="8 年后残值继续衰减（每年约 1.5%），最低约 3%（报废价格，新能源车约 5000-8000 元）。"
             >
               <InputNumber style={{ width: INPUT_NUMBER_WIDTH }} min={1} suffix="年" />
             </Form.Item>
