@@ -69,5 +69,13 @@
   },
   "engines": {
     "node": ">=22"
+  },
+  "pnpm": {
+    "allowBuilds": {
+      "core-js": true,
+      "es5-ext": true,
+      "esbuild": true,
+      "sharp": true
+    }
   }
 }
