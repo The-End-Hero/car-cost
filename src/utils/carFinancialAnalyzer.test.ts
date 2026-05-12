@@ -35,7 +35,8 @@ describe("carFinancialAnalyzer 计算", () => {
     // 交叉验证关键关系：
     // lostInvestmentGain = opportunityCostWealth - totalOutflow
     // netWealthImpact = opportunityCostWealth - totalResidualAtEnd + loanRemainingAtEnd
-    const finalOpportunityCost = result.series.at(-1)?.opportunityCostWealth ?? 0;
+    const lastSeries = result.series[result.series.length - 1];
+    const finalOpportunityCost = lastSeries?.opportunityCostWealth ?? 0;
     expect(result.summary.lostInvestmentGain).toBeCloseTo(
       finalOpportunityCost - result.summary.totalOutflow,
       6
