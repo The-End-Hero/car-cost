@@ -20,7 +20,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    // TS 6: types now defaults to [] instead of auto-scanning @types
+    "types": ["node"]
   },
   "include": [
     "vite.config.ts"

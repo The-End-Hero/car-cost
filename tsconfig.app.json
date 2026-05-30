@@ -22,11 +22,13 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
-    // alias
-    "baseUrl": "./",
+    // alias (TS 6: baseUrl deprecated, paths use absolute prefixes)
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+
+    // TS 6: types now defaults to [] instead of auto-scanning @types
+    "types": ["node"]
   },
   "include": ["src"]
 }
