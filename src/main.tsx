@@ -27,12 +27,13 @@ const isParentHostLocalhost = (() => {
   }
 })();
 
-// 生产环境默认启用；但 file 协议或 localhost 容器下不启用
+// 生产环境默认启用；但 file 协议或 localhost 容器下不启用；被 iframe 嵌入时也不启用
 if (
   import.meta.env.PROD &&
   !isFileProtocol &&
   !isCurrentHostLocalhost &&
-  !isParentHostLocalhost
+  !isParentHostLocalhost &&
+  window.self === window.top
 ) {
   disableDevtool();
 }
