@@ -3,7 +3,7 @@ import { Button, Card, Collapse, Form, InputNumber, Statistic, Typography } from
 import { useWatch } from "antd/es/form/Form";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as echarts from "echarts";
-import { useThemeStore } from "@/stores/theme";
+import { useThemeMode } from "@/hooks/useThemeMode";
 import {
   calcCarCost,
   calcMonthlyOpExFromAnnual,
@@ -332,7 +332,7 @@ const Home = () => {
   const [isSavingReport, setIsSavingReport] = useState(false);
   const lineChartRef = useRef<HTMLDivElement>(null);
   const barChartRef = useRef<HTMLDivElement>(null);
-  const isDark = useThemeStore((s) => s.isDark());
+  const { isDark } = useThemeMode();
 
   const handleSaveReport = async () => {
     if (!reportRef.current) return;

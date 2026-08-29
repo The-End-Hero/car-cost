@@ -5,22 +5,45 @@
     <link rel="icon" type="image/svg+xml" href="/car.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>car cost</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <!-- 首屏主题：与 stores/theme 同 key，默认暗色，避免闪亮 -->
     <script>
+      // Resolve theme synchronously before first paint to avoid light<->dark flash.
+      // Priority: URL ?theme= > localStorage (zustand persist) > default "dark".
+      // Mirrors the logic in src/hooks/useThemeMode.ts.
       (function () {
-        var key = "car-cost-theme";
+        var STORAGE_KEY = "car-cost-theme";
+        function apply(mode) {
+          if (mode === "dark") {
+            document.documentElement.classList.add("dark");
+            document.documentElement.setAttribute("data-antd-theme", "dark");
+          }
+        }
         try {
-          var raw = localStorage.getItem(key);
-          var mode = raw ? (JSON.parse(raw).state?.mode) : null;
-          if (mode !== "light") document.documentElement.classList.add("dark");
+          // HashRouter: query lives after "?" in window.location.hash
+          var hash = window.location.hash;
+          var qIdx = hash.indexOf("?");
+          var qStr = qIdx >= 0 ? hash.slice(qIdx + 1) : "";
+          var urlTheme = new URLSearchParams(qStr).get("theme");
+          if (urlTheme === "dark") { apply("dark"); return; }
+          if (urlTheme === "light") { apply("light"); return; }
+
+          // localStorage
+          var raw = localStorage.getItem(STORAGE_KEY);
+          var mode = null;
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (parsed && parsed.state) mode = parsed.state.mode;
+          }
+          if (mode === "dark" || mode === "light") { apply(mode); return; }
+
+          apply("dark"); // default
         } catch (e) {
-          document.documentElement.classList.add("dark");
+          apply("dark");
         }
       })();
     </script>
+  </head>
+  <body>
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,10 +1,9 @@
 import { Switch } from "antd";
 import { Sun, Moon } from "lucide-react";
-import { useThemeStore } from "@/stores/theme";
+import { useThemeMode } from "@/hooks/useThemeMode";
 
 export function ThemeSwitch() {
-  const { mode, toggleMode } = useThemeStore();
-  const isDark = mode === "dark";
+  const { isDark, toggleMode } = useThemeMode();
 
   const iconWrap =
     "flex items-center justify-center h-[22px] w-[18px] [&>svg]:block";

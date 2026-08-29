@@ -1,4 +1,4 @@
-import { HashRouter, Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Home from "@/pages/home/Home.tsx";
 import "./App.css";
 import { AnimatePresence } from "motion/react";
@@ -7,17 +7,15 @@ import { Footer } from "@/components/Footer";
 
 function App() {
   return (
-    <HashRouter>
-      <div className="min-h-screen flex flex-col">
-        <div className="fixed top-4 right-4 z-50">
-          <ThemeSwitch />
-        </div>
-        <main className="flex-1">
-          <AppContent />
-        </main>
-        <Footer />
+    <div className="min-h-screen flex flex-col">
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeSwitch />
       </div>
-    </HashRouter>
+      <main className="flex-1">
+        <AppContent />
+      </main>
+      <Footer />
+    </div>
   );
 }
 
