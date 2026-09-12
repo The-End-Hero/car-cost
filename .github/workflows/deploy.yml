@@ -37,7 +37,6 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
-          #          server-dir: /www/wwwroot/r3-page.letmecc.work/
           server-dir: ./
           exclude: |
             **/.DS_Store
