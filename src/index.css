@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Tailwind v4 主题：暴露字体变量给 font-sans / font-mono 工具类 */
+@theme {
+  --font-sans: "Noto Sans SC", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
 /* 全局主题背景：与 antd 暗色/亮色一致 */
 html {
   color-scheme: light;
@@ -10,6 +15,10 @@ html.dark {
 body {
   background-color: #ffffff;
   color: rgba(0, 0, 0, 0.88);
+  font-family: var(--font-sans);
+  /* 金额/数字等宽对齐：tabular-nums 对所有数字生效 */
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
 }
 #root {
   min-height: 100vh;

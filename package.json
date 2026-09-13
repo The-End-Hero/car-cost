@@ -13,6 +13,7 @@
     "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
+    "@fontsource/noto-sans-sc": "^5.3.0",
     "@tailwindcss/vite": "^4.3.3",
     "@xiping/react-components": "^1.0.95",
     "@zumer/snapdom": "^2.24.18",
