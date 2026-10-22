@@ -35,29 +35,4 @@
 
 ## @zumer/snapdom `^2.24.18` → `3.2.0`
 
-| 项 | 内容 |
-| --- | --- |
-| 包名 | `@zumer/snapdom` |
-| 当前版本 | 2.24.18（声明为 `^2.24.18`） |
-| 最新版本 | 3.2.0 |
-| 依赖类型 | dependencies |
-| 首次记录 | 2026-10-01 |
-| 状态 | 暂缓 |
-
-### 为何未自动升级
-
-- 属于 **x 主版本** 更新（2 → 3），按策略不自动升级。
-- v3 为新的浏览器捕获引擎架构，API 与 v2 有差异（例如导出路径、`result.download` 参数形态、插件体系等）；官方提供 [v2 → v3 迁移指南](https://snapdom.dev/) 与独立 v2 文档。
-- 项目内在 `src/pages/home/Home.tsx` 使用 `snapdom(element, options)` 与 `result.download({ filename })` 保存报表截图，升级需对照 v3 API 调整并回归截图样式（含 InputNumber suffix 防换行相关 CSS）。
-
-### 建议人工评估
-
-1. 阅读 snapdom v3 迁移说明与 [FEATURES.md](https://github.com/zumerlab/snapdom/blob/main/FEATURES.md)。
-2. 在分支将依赖升至 `^3.2.0`，按 v3 改写 `handleSaveReport` 中的调用方式。
-3. 在明暗主题下手动验证报表 PNG 导出尺寸与布局，再跑 `pnpm test`、`pnpm build`。
-
-### 参考
-
-- https://www.npmjs.com/package/@zumer/snapdom
-- https://snapdom.dev/
-- https://github.com/zumerlab/snapdom/tree/v2
+> **已解决**：2026-10-22 升级至 `^3.3.6`。项目仅在 `Home.tsx` 使用 `snapdom(element, { backgroundColor, width })` 与 `result.download({ filename })`，对照 v3 迁移指南确认 API 保持兼容（width 优先于 scale，未涉及被移除的 `preCache`/`burst`/`compress` 等选项）。`tsc -b` 类型检查与 19 个测试通过，待人工在明暗主题下回归一次截图导出样式。
