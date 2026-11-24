@@ -2,6 +2,7 @@ import { ConfigProvider, theme as antdTheme } from "antd";
 import { useEffect } from "react";
 import { useThemeStore } from "@/stores/theme";
 import { useThemeMode } from "@/hooks/useThemeMode";
+import { APP_ANTD_DARK_THEME } from "@/theme/antd";
 
 const ANT_THEME_ATTR = "data-antd-theme";
 
@@ -25,9 +26,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ConfigProvider
-      theme={{
-        algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
-      }}
+      theme={
+        isDark
+          ? APP_ANTD_DARK_THEME
+          : { algorithm: antdTheme.defaultAlgorithm }
+      }
     >
       {children}
     </ConfigProvider>

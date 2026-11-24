@@ -4,6 +4,7 @@ import { useWatch } from "antd/es/form/Form";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as echarts from "echarts";
 import { useThemeMode } from "@/hooks/useThemeMode";
+import { DESIGN_TOKENS } from "@/theme/tokens";
 import {
   calcCarCost,
   calcMonthlyOpExFromAnnual,
@@ -162,37 +163,37 @@ const DepreciationHint = () => (
         label: "电动车 vs 燃油车 折旧率对比（中国市场平均参考值）",
         children: (
           <div className="space-y-2 text-sm">
-            <table className="w-full border-collapse border border-solid border-gray-300 dark:border-gray-600">
+            <table className="w-full border-collapse border border-solid border-gray-300 dark:border-[var(--border-default)]">
               <thead>
-                <tr className="bg-gray-100 dark:bg-gray-700">
-                  <th className="border border-gray-300 dark:border-gray-600 p-1">车龄</th>
-                  <th className="border border-gray-300 dark:border-gray-600 p-1">电动车残值率</th>
-                  <th className="border border-gray-300 dark:border-gray-600 p-1">电动车折旧率</th>
-                  <th className="border border-gray-300 dark:border-gray-600 p-1">燃油车残值率</th>
-                  <th className="border border-gray-300 dark:border-gray-600 p-1">燃油车折旧率</th>
+                <tr className="bg-gray-100 dark:bg-[var(--bg-elevated)]">
+                  <th className="border border-gray-300 dark:border-[var(--border-default)] p-1">车龄</th>
+                  <th className="border border-gray-300 dark:border-[var(--border-default)] p-1">电动车残值率</th>
+                  <th className="border border-gray-300 dark:border-[var(--border-default)] p-1">电动车折旧率</th>
+                  <th className="border border-gray-300 dark:border-[var(--border-default)] p-1">燃油车残值率</th>
+                  <th className="border border-gray-300 dark:border-[var(--border-default)] p-1">燃油车折旧率</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td className="border border-gray-300 dark:border-gray-600 p-1">3 年</td>
-                  <td className="border border-gray-300 dark:border-gray-600 p-1">43% - 55%</td>
-                  <td className="border border-gray-300 dark:border-gray-600 p-1">45% - 57%</td>
-                  <td className="border border-gray-300 dark:border-gray-600 p-1">48% - 65%</td>
-                  <td className="border border-gray-300 dark:border-gray-600 p-1">35% - 52%</td>
+                  <td className="border border-gray-300 dark:border-[var(--border-default)] p-1">3 年</td>
+                  <td className="border border-gray-300 dark:border-[var(--border-default)] p-1">43% - 55%</td>
+                  <td className="border border-gray-300 dark:border-[var(--border-default)] p-1">45% - 57%</td>
+                  <td className="border border-gray-300 dark:border-[var(--border-default)] p-1">48% - 65%</td>
+                  <td className="border border-gray-300 dark:border-[var(--border-default)] p-1">35% - 52%</td>
                 </tr>
                 <tr>
-                  <td className="border border-gray-300 dark:border-gray-600 p-1">5 年</td>
-                  <td className="border border-gray-300 dark:border-gray-600 p-1">35% - 51%</td>
-                  <td className="border border-gray-300 dark:border-gray-600 p-1">49% - 65%</td>
-                  <td className="border border-gray-300 dark:border-gray-600 p-1">50% - 61%</td>
-                  <td className="border border-gray-300 dark:border-gray-600 p-1">39% - 50%</td>
+                  <td className="border border-gray-300 dark:border-[var(--border-default)] p-1">5 年</td>
+                  <td className="border border-gray-300 dark:border-[var(--border-default)] p-1">35% - 51%</td>
+                  <td className="border border-gray-300 dark:border-[var(--border-default)] p-1">49% - 65%</td>
+                  <td className="border border-gray-300 dark:border-[var(--border-default)] p-1">50% - 61%</td>
+                  <td className="border border-gray-300 dark:border-[var(--border-default)] p-1">39% - 50%</td>
                 </tr>
                 <tr>
-                  <td className="border border-gray-300 dark:border-gray-600 p-1">8 年</td>
-                  <td className="border border-gray-300 dark:border-gray-600 p-1">~20%</td>
-                  <td className="border border-gray-300 dark:border-gray-600 p-1">~80%</td>
-                  <td className="border border-gray-300 dark:border-gray-600 p-1">~25%</td>
-                  <td className="border border-gray-300 dark:border-gray-600 p-1">~75%</td>
+                  <td className="border border-gray-300 dark:border-[var(--border-default)] p-1">8 年</td>
+                  <td className="border border-gray-300 dark:border-[var(--border-default)] p-1">~20%</td>
+                  <td className="border border-gray-300 dark:border-[var(--border-default)] p-1">~80%</td>
+                  <td className="border border-gray-300 dark:border-[var(--border-default)] p-1">~25%</td>
+                  <td className="border border-gray-300 dark:border-[var(--border-default)] p-1">~75%</td>
                 </tr>
               </tbody>
             </table>
@@ -210,7 +211,7 @@ const DepreciationHint = () => (
               <li>8 年期：电动车残值约 20%，燃油车约 25%，差距趋稳</li>
               <li>头部新能源品牌（如特斯拉、比亚迪）保值率接近燃油车平均水平</li>
             </ul>
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-gray-500 dark:text-[var(--text-tertiary)]">
               以上为行业平均值参考，实际残值受品牌、车型、地区、新车降价、电池质保等因素影响，建议结合具体车型二手车挂牌价综合判断。
             </p>
           </div>
@@ -340,7 +341,7 @@ const Home = () => {
     await new Promise((r) => setTimeout(r, 200));
     try {
       const result = await snapdom(reportRef.current, {
-        backgroundColor: isDark ? "#000000" : "#ffffff",
+        backgroundColor: isDark ? DESIGN_TOKENS.bgDeep : "#ffffff",
         width: 672, // 与 max-w-2xl 一致，避免截图时宽度收缩导致 suffix 换行
       });
       await result.download({
@@ -390,6 +391,7 @@ const Home = () => {
     );
     const netWealthLoss = s.map((p) => p.netWealthLoss);
     chart.setOption({
+      backgroundColor: "transparent",
       tooltip: {
         trigger: "axis",
         valueFormatter: (value: number) =>
@@ -458,6 +460,7 @@ const Home = () => {
       { value: totalOpEx, name: "养车总额" },
     ].filter((d) => d.value > 0);
     chart.setOption({
+      backgroundColor: "transparent",
       tooltip: {
         trigger: "item",
         valueFormatter: (value: number) =>
@@ -641,7 +644,7 @@ const Home = () => {
 
           <div className="mb-4 mt-6">
             <Typography.Title level={5}>现金流与机会成本参数（贷款、复利、残值）</Typography.Title>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+            <p className="text-sm text-gray-500 dark:text-[var(--text-tertiary)] mb-3">
               残值率由上方「5 年折旧率」自动推导（约等于 1 - 5 年折旧率），即使分析年数不是 5 年，也统一按这一期末残值率估算，无需单独填写。
             </p>
             <Form.Item
@@ -698,14 +701,14 @@ const Home = () => {
             >
               <span className="text-base">
                 {formatMoney(computedMonthlyOpEx)} 元
-                <span className="ml-2 text-gray-500 dark:text-gray-400 text-sm">（自动计算）</span>
+                <span className="ml-2 text-gray-500 dark:text-[var(--text-tertiary)] text-sm">（自动计算）</span>
               </span>
             </Form.Item>
             <Form.Item
               name="marketReturnRate"
               label="理财年化收益率（机会成本）"
               extra={
-                <div className="text-gray-500 dark:text-gray-400 text-sm space-y-0.5">
+                <div className="text-gray-500 dark:text-[var(--text-tertiary)] text-sm space-y-0.5">
                   <div>参考：定投纳斯达克100 近10年年化约 12%</div>
                   <div>参考：定投红利低波 ETF 近10年年化约 8%</div>
                   <div>以上为历史收益率，仅供参考，不代表未来表现，建议按保守预期填写。</div>

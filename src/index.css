@@ -5,12 +5,25 @@
   --font-sans: "Noto Sans SC", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-/* 全局主题背景：与 antd 暗色/亮色一致 */
+/* 全局主题：亮色保持 antd 默认；深色对齐黑金 token（与 tokens.ts 一致） */
 html {
   color-scheme: light;
 }
 html.dark {
   color-scheme: dark;
+  --bg-deep: #0a0a0a;
+  --bg-elevated: #171512;
+  --bg-surface: #201c16;
+  --border-default: #3d3423;
+  --accent: #d4af37;
+  --accent-muted: rgba(212, 175, 55, 0.2);
+  --text-primary: rgba(255, 255, 255, 0.85);
+  --text-secondary: rgba(255, 255, 255, 0.65);
+  --text-tertiary: rgba(255, 255, 255, 0.45);
+  --radius: 8px;
+  --motion-fast: 150ms;
+  --motion-normal: 250ms;
+  --motion-easing: cubic-bezier(0.16, 1, 0.3, 1);
 }
 body {
   background-color: #ffffff;
@@ -24,8 +37,8 @@ body {
   min-height: 100vh;
 }
 html.dark body {
-  background-color: #141414;
-  color: rgba(255, 255, 255, 0.85);
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
 }
 
 /* 防止 snapdom 截图时 InputNumber 右侧 suffix 换行 */
